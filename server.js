@@ -311,7 +311,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
 `;
 
                         const response = await genAI.models.generateContent({
-                            model: 'gemini-2.5-flash',
+                            model: 'gemini-3.8-flash',
                             contents: mensagem,
                             config: {
                                 systemInstruction: promptSistema
@@ -321,7 +321,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                         if (response && response.text) {
                             return sendJSON(res, {
                                 resposta: response.text,
-                                fonte: 'gemini-2.5-flash + SQLite',
+                                fonte: 'gemini-3.8-flash + PostgreSQL',
                                 timestamp: new Date().toISOString()
                             });
                         }
