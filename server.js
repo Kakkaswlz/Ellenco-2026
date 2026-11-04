@@ -5,6 +5,8 @@
  * ====================================================================
  */
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
