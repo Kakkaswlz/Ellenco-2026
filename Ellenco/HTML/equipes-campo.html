@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Equipes de Campo & Produtividade</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto animate-fade-in-up">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Equipes de Campo</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Gestão do efetivo, produtividade acumulada e frentes ativas de produção.</p>
+                </div>
+                <button onclick="abrirModalNovaEquipe()" class="bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-plus text-ellenco-red"></i> Cadastrar Nova Equipe
+                </button>
+            </div>
+
+            <!-- GRID DE CARDS DAS EQUIPES -->
+            <div id="gridEquipes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Preenchido via JS -->
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL NOVA EQUIPE -->
+    <div id="modalNovaEquipe" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop animate-fade-in-up">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-black text-slate-900 text-lg">Cadastrar Nova Equipe</h3>
+                <button onclick="fecharModalNovaEquipe()" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="formNovaEquipe" onsubmit="salvarNovaEquipe(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Equipe *</label>
+                    <input id="novaEquipeNome" required placeholder="Ex: Equipe Pavimentação 03" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Encarregado Líder *</label>
+                    <input id="novaEquipeEncarregado" required placeholder="Ex: Fernando Matos (RE-5520)" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Atividade Principal *</label>
+                    <select id="novaEquipeAtividade" required class="w-full border border-slate-300 rounded-xl px-2.5 py-2 text-xs outline-none">
+                        <option value="Pavimentação CBUQ">Pavimentação CBUQ</option>
+                        <option value="Corte e Aterro">Corte e Aterro / Terraplanagem</option>
+                        <option value="Galerias e Drenagem">Galerias e Drenagem</option>
+                        <option value="Base Brita Graduada (BGS)">Base Brita Graduada (BGS)</option>
+                        <option value="Fresagem Asfáltica">Fresagem Asfáltica</option>
+                        <option value="Sinalização Viária">Sinalização Viária</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Obra Alocada *</label>
+                        <select id="novaEquipeObra" required class="w-full border border-slate-300 rounded-xl px-2.5 py-2 text-xs outline-none">
+                            <option value="SP-270 Rodovia Raposo Tavares">SP-270 Raposo Tavares</option>
+                            <option value="Loteamento Jardim Ellenco">Jardim Ellenco</option>
+                            <option value="Pavimentação Industrial">Pavimentação Industrial</option>
+                            <option value="Aeroporto Estadual">Aeroporto Estadual</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Efetivo de Pessoas *</label>
+                        <input id="novaEquipeIntegrantes" type="number" min="1" max="50" value="12" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="fecharModalNovaEquipe()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-ellenco-navy hover:bg-ellenco-blue text-white font-bold rounded-xl text-xs cursor-pointer shadow-md">
+                        Salvar Equipe
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/equipes.js"></script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Novo Apontamento de Produção</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- CONTEÚDO DO FORMULÁRIO -->
+        <div class="p-4 md:p-8 max-w-4xl w-full mx-auto animate-fade-in-up">
+            
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+                
+                <!-- HEADER BANNER DO BDP -->
+                <div class="gradient-brand p-6 md:p-8 text-white relative">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <span class="px-3 py-1 rounded-full bg-white/10 text-red-200 text-[11px] font-bold border border-white/10 uppercase tracking-wider">
+                                Boletim Diário de Produção (BDP)
+                            </span>
+                            <h2 class="text-2xl md:text-3xl font-black mt-2 tracking-tight">Registro de Apontamento de Campo</h2>
+                            <p class="text-xs text-slate-300 mt-1">Gravação direta no banco de dados SQLite com recálculo automático de eficiência.</p>
+                        </div>
+                        <div class="text-right bg-white/10 px-4 py-2.5 rounded-xl backdrop-blur-md border border-white/15 shrink-0">
+                            <span class="text-[10px] uppercase font-bold text-slate-300 block">Protocolo Oficial</span>
+                            <span id="protocoloNumero" class="font-mono text-base font-black text-amber-300">BDP-2026-8842</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CORPO DO FORMULÁRIO -->
+                <div class="p-6 md:p-8">
+                    <form id="formApontamento" onsubmit="registrarApontamento(event)" class="space-y-8">
+
+                        <!-- ETAPA 1: IDENTIFICAÇÃO DA OBRA E EQUIPE -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                                <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">1</span>
+                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Identificação da Frente de Serviço & Equipe</h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Data da Produção *</label>
+                                    <input type="date" id="data" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Obra / Contrato *</label>
+                                    <select id="obra" required onchange="aoMudarObra()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold">
+                                        <option value="SP-270 Rodovia Raposo Tavares">SP-270 Rodovia Raposo Tavares</option>
+                                        <option value="Loteamento Jardim Ellenco">Loteamento Jardim Ellenco</option>
+                                        <option value="Pavimentação Industrial">Pavimentação Industrial</option>
+                                        <option value="Aeroporto Estadual">Aeroporto Estadual</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Turno de Trabalho *</label>
+                                    <select id="turno" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                                        <option value="Diurno">☀️ Diurno (07:00 às 17:00)</option>
+                                        <option value="Noturno">🌙 Noturno (22:00 às 05:00)</option>
+                                        <option value="Especial">⚡ Especial / Plantão</option>
+                                    </select>
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Equipe de Campo *</label>
+                                    <select id="equipe" required onchange="aoMudarEquipe()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800">
+                                        <option value="Equipe Pavimentação 01">Equipe Pavimentação 01 (Carlos Silva)</option>
+                                        <option value="Equipe Terraplanagem 02">Equipe Terraplanagem 02 (Marcos Souza)</option>
+                                        <option value="Equipe Drenagem 01">Equipe Drenagem 01 (José Santos)</option>
+                                        <option value="Equipe Base 03">Equipe Base 03 (Antônio Ferreira)</option>
+                                        <option value="Equipe Fresagem 01">Equipe Fresagem 01 (Paulo Lima)</option>
+                                        <option value="Equipe Sinalização Noturna">Equipe Sinalização Noturna (Roberto Dias)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Líder / Encarregado *</label>
+                                    <input type="text" id="encarregado" required value="Carlos Silva" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-semibold">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 2: ATIVIDADE E VOLUMES (CÁLCULO AUTOMÁTICO) -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                                <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">2</span>
+                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Atividade & Volumes Medidos</h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipo de Serviço / Atividade *</label>
+                                    <select id="atividade" required onchange="alterarUnidade()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800">
+                                        <option value="Pavimentação CBUQ - Capa Asfáltica">Pavimentação CBUQ - Capa Asfáltica (ton)</option>
+                                        <option value="Terraplanagem - Corte e Aterro">Terraplanagem - Corte e Aterro (m³)</option>
+                                        <option value="Aplicação de Brita Graduada (BGS)">Aplicação de Brita Graduada - BGS (m³)</option>
+                                        <option value="Assentamento de Tubos e Galerias">Assentamento de Tubos e Galerias (m)</option>
+                                        <option value="Fresagem de Pavimento Asfáltico">Fresagem de Pavimento Asfáltico (m²)</option>
+                                        <option value="Pintura Termoplástica e Tachas">Pintura Termoplástica e Sinalização (m²)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Unidade Técnica</label>
+                                    <input type="text" id="unidade" readonly value="ton" class="w-full border border-slate-200 bg-slate-100 text-slate-700 font-bold rounded-xl px-3.5 py-2.5 text-xs outline-none text-center">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Horas de Jornada *</label>
+                                    <input type="number" id="horas" step="0.5" min="1" max="24" value="8.5" required oninput="calcularDesvio()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-semibold">
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label id="labelMetaPlanejada" class="block text-xs font-bold text-slate-700 mb-1.5">Meta Programada (ton) *</label>
+                                    <input type="number" id="planejado" step="0.1" min="1" required placeholder="Ex: 450" oninput="calcularDesvio()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-base text-slate-900">
+                                </div>
+
+                                <div class="sm:col-span-2">
+                                    <label id="labelProducaoRealizada" class="block text-xs font-bold text-slate-700 mb-1.5">Volume Realizado em Campo (ton) *</label>
+                                    <input type="number" id="realizado" step="0.1" min="0" required placeholder="Ex: 462" oninput="calcularDesvio()" class="w-full border-2 border-ellenco-navy rounded-xl px-3.5 py-2.5 text-xs outline-none font-black text-base text-slate-900 focus:ring-2 focus:ring-ellenco-blue">
+                                </div>
+                            </div>
+
+                            <!-- CARD DE RESULTADO EM TEMPO REAL -->
+                            <div id="boxResultado" class="p-4 rounded-2xl border bg-slate-50 border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all">
+                                <div class="flex items-center gap-3">
+                                    <i id="iconeResultado" class="fa-solid fa-calculator text-2xl text-slate-400"></i>
+                                    <div>
+                                        <h4 id="textoResultado" class="text-sm font-black text-slate-800">Aguardando preenchimento dos volumes...</h4>
+                                        <p id="detalheResultado" class="text-xs text-slate-500">Insira a meta e a produção realizada para ver o cálculo automático.</p>
+                                    </div>
+                                </div>
+
+                                <div class="flex items-center gap-4 text-right shrink-0">
+                                    <div>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Eficiência</span>
+                                        <span id="resEficiencia" class="text-base font-black text-slate-900">0%</span>
+                                    </div>
+                                    <div class="border-l border-slate-200 pl-4">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Desvio</span>
+                                        <span id="resDesvio" class="text-base font-black text-slate-900">0%</span>
+                                    </div>
+                                    <div class="border-l border-slate-200 pl-4">
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Prod./Hora</span>
+                                        <span id="resProdutividade" class="text-base font-black text-slate-900">0 un/h</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- ALERTA DE TYPO / OUTLIER -->
+                            <div id="avisoAlertaTypo" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
+                                <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
+                                <span><strong>Atenção:</strong> O volume executado é muito superior à meta programada (+300%). Confirme a digitação antes de salvar.</span>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 3: CONDIÇÕES OPERACIONAIS & ASSINATURA -->
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
+                                <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">3</span>
+                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Condições de Campo & Termo Digital</h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Efetivo de Pessoas *</label>
+                                    <input type="number" id="efetivo" min="1" max="100" value="14" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Condição Climática *</label>
+                                    <select id="clima" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                                        <option value="Ensolarado">☀️ Ensolarado / Bom Tempo</option>
+                                        <option value="Nublado">⛅ Nublado</option>
+                                        <option value="Chuva Leve">🌦️ Chuva Leve (Solo Úmido)</option>
+                                        <option value="Chuva Forte (Parado)">🌧️ Chuva Forte (Operação Parada)</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Motivo de Paralisação</label>
+                                    <select id="motivoParada" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
+                                        <option value="Nenhum">Nenhum (Produção Contínua)</option>
+                                        <option value="Manutenção de Equipamento">Manutenção de Equipamento</option>
+                                        <option value="Falta de Insumo / Usina">Atraso de Insumos / Usina</option>
+                                        <option value="Chuva / Clima">Interferência Climática</option>
+                                        <option value="Interferência de Tráfego">Interferência de Tráfego</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- HELPER: PUXAR CLIMA API -->
+                            <div class="flex items-center justify-between p-3.5 rounded-xl bg-blue-50 border border-blue-200">
+                                <div class="flex items-center gap-2.5">
+                                    <i class="fa-solid fa-cloud-sun text-blue-600 text-lg"></i>
+                                    <div>
+                                        <p class="text-xs font-bold text-blue-950">Preenchimento Meteorológico Inteligente</p>
+                                        <p class="text-[11px] text-blue-700">Consulte a API Open-Meteo para preencher as condições da obra automaticamente.</p>
+                                    </div>
+                                </div>
+                                <button type="button" onclick="puxarClimaParaFormulario()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shrink-0">
+                                    <i class="fa-solid fa-arrows-rotate"></i> Consultar Clima
+                                </button>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Observações Operacionais & Ocorrências</label>
+                                <textarea id="observacao" rows="3" placeholder="Relate detalhes importantes da jornada, trecho trabalhado (km), ocorrências mecânicas ou justificativas de desvio..." class="w-full border border-slate-300 rounded-xl p-3 text-xs outline-none resize-none"></textarea>
+                            </div>
+
+                            <!-- ASSINATURA DIGITAL -->
+                            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-signature text-2xl text-ellenco-navy"></i>
+                                    <div>
+                                        <p class="text-xs font-bold text-slate-900">Termo de Validação do Responsável</p>
+                                        <p class="text-[11px] text-slate-500">Declaro que as medições prestadas correspondem fielmente à produção executada em campo.</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <input type="checkbox" id="checkAssinatura" required class="w-4 h-4 rounded text-ellenco-red cursor-pointer">
+                                    <label for="checkAssinatura" class="text-xs font-bold text-slate-800 cursor-pointer">Assinado Digitalmente</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BOTÕES DE AÇÃO -->
+                        <div class="flex flex-col sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-100">
+                            <button type="button" onclick="limparFormulario()" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors cursor-pointer">
+                                Limpar Campos
+                            </button>
+                            <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-black transition-all shadow-lg shadow-ellenco-navy/20 flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-check text-ellenco-red"></i> Gravar Apontamento no Banco de Dados
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/novo-apontamento.js"></script>
+</body>
+</html>

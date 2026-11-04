@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Gestão de Acessos & Aprovações</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto animate-fade-in-up">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 text-[10px] font-bold uppercase mb-2">
+                        <i class="fa-solid fa-lock"></i> Exclusivo Engenharia / Diretoria
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Gestão de Acessos & Aprovações</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Análise e liberação de solicitações de novos colaboradores no banco de dados.</p>
+                </div>
+            </div>
+
+            <!-- CARDS DE RESUMO DE USUÁRIOS -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-amber-600">Aguardando Aprovação</span>
+                    <h3 id="statPendentes" class="text-2xl font-black text-amber-600 mt-1">0</h3>
+                    <p class="text-[11px] text-slate-400">Solicitações pendentes na fila</p>
+                </div>
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-emerald-600">Usuários Ativos</span>
+                    <h3 id="statAprovados" class="text-2xl font-black text-emerald-600 mt-1">0</h3>
+                    <p class="text-[11px] text-slate-400">Colaboradores com acesso liberado</p>
+                </div>
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-slate-500">Total no Banco</span>
+                    <h3 id="statTotalUsuarios" class="text-2xl font-black text-slate-900 mt-1">0</h3>
+                    <p class="text-[11px] text-slate-400">Contas registradas no SQLite</p>
+                </div>
+            </div>
+
+            <!-- TABELA DE USUÁRIOS PENDENTES & ATIVOS -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="font-extrabold text-slate-900 text-base">Fila de Colaboradores & Status</h3>
+                    <span class="badge badge-info"><i class="fa-solid fa-users-gear"></i> Controle RBAC</span>
+                </div>
+
+                <div class="app-table-container">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>RE / Registro</th>
+                                <th>E-mail</th>
+                                <th>Cargo Pretendido</th>
+                                <th>Obra Alocada</th>
+                                <th>Data Solicitação</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaAprovacoes">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/aprovacoes.js"></script>
+</body>
+</html>

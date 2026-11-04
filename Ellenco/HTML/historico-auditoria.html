@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Histórico & Auditoria de Produção</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- Export Libraries: SheetJS (XLSX) & html2pdf -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- PRINT HEADER -->
+        <div class="hidden print-header p-6 border-b border-slate-300 items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="../IMG/logo.png" alt="Ellenco Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='logo.png';">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-900">ELLENCO CONSTRUÇÕES E PAVIMENTAÇÃO</h2>
+                    <p class="text-xs text-slate-600">Relatório de Auditoria de Apontamentos de Produção</p>
+                </div>
+            </div>
+            <div class="text-right text-xs text-slate-500">
+                <p>Emissão: <strong id="printDataEmissao">27/08/2026</strong></p>
+                <p>Base: SQLite Relacional</p>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto animate-fade-in-up">
+            
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
+                
+                <!-- HEADER DA PÁGINA COM BOTÕES DE EXPORTAÇÃO -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-5 border-b border-slate-100">
+                    <div>
+                        <h2 class="text-2xl font-black text-slate-900 tracking-tight">Histórico & Auditoria de Produção</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Auditoria e conferência de todos os boletins registrados no banco de dados SQLite.</p>
+                    </div>
+
+                    <div class="flex flex-wrap items-center gap-2.5 no-print">
+                        <button onclick="exportarExcel()" class="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 transition-colors flex items-center gap-2 cursor-pointer shadow-xs">
+                            <i class="fa-solid fa-file-excel text-emerald-600 text-sm"></i> Exportar Excel
+                        </button>
+                        <button onclick="exportarPDF()" class="px-3.5 py-2 rounded-xl bg-red-50 hover:bg-red-100 text-ellenco-red text-xs font-bold border border-red-200 transition-colors flex items-center gap-2 cursor-pointer shadow-xs">
+                            <i class="fa-solid fa-file-pdf text-ellenco-red text-sm"></i> Exportar PDF
+                        </button>
+                        <button onclick="window.print()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold border border-slate-200 transition-colors flex items-center gap-2 cursor-pointer shadow-xs">
+                            <i class="fa-solid fa-print text-sm"></i> Imprimir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- BARRA DE FILTROS COMBINADOS -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 no-print">
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                        <input id="filtroHistorico" oninput="renderizarHistorico()" placeholder="Buscar por equipe, líder, obra..." class="w-full border border-slate-300 rounded-xl pl-9 pr-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                    </div>
+
+                    <div>
+                        <select id="filtroStatusHistorico" onchange="renderizarHistorico()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none font-semibold text-slate-700">
+                            <option value="todos">Todos os Desempenhos</option>
+                            <option value="acima">Superou / Na Meta (&ge;90%)</option>
+                            <option value="critico">Desvio Crítico (&lt;90%)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <select id="filtroObraHistorico" onchange="renderizarHistorico()" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none font-semibold text-slate-700">
+                            <option value="todas">Todas as Obras</option>
+                            <option value="SP-270 Rodovia Raposo Tavares">SP-270 Raposo Tavares</option>
+                            <option value="Loteamento Jardim Ellenco">Jardim Ellenco</option>
+                            <option value="Pavimentação Industrial">Pavimentação Industrial</option>
+                            <option value="Aeroporto Estadual">Aeroporto Estadual</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end">
+                        <span id="contadorRegistrosHistorico" class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-2 rounded-xl border border-slate-200">
+                            Carregando registros...
+                        </span>
+                    </div>
+                </div>
+
+                <!-- TABELA DE AUDITORIA -->
+                <div class="app-table-container">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Protocolo</th>
+                                <th>Obra / Frente</th>
+                                <th>Equipe / Líder</th>
+                                <th>Atividade</th>
+                                <th class="text-right">Meta</th>
+                                <th class="text-right">Realizado</th>
+                                <th class="text-right">Desvio</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center no-print">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaHistorico">
+                            <!-- Injetado dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL DE DETALHES DO APONTAMENTO -->
+    <div id="modalDetalhesApontamento" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop animate-fade-in-up">
+        <div class="bg-white rounded-3xl max-w-lg w-full shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div>
+                    <span id="modalDetalheProtocolo" class="font-mono text-xs font-black text-ellenco-navy">BDP-2026-XXXX</span>
+                    <h3 class="font-black text-slate-900 text-lg">Detalhes do Apontamento</h3>
+                </div>
+                <button onclick="fecharModalDetalhes()" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div id="conteudoModalDetalhes" class="space-y-3.5 text-xs text-slate-700">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex justify-end">
+                <button onclick="fecharModalDetalhes()" class="px-5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer transition-colors">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/historico.js"></script>
+</body>
+</html>

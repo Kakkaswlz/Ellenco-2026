@@ -1,0 +1,2667 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Ellenco | Construindo caminhos e sonhos desde 1951</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet"
+    >
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            blue: '#012D69',
+                            blueLight: '#0A3F8F',
+                            red: '#FC0109',
+                            redDark: '#D90007',
+                            dark: '#06111F',
+                            gray: '#F5F7FA'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+
+        * {
+            font-family: 'Inter', sans-serif;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: #fff;
+            color: #06111F;
+        }
+
+        /* =========================================
+           HEADER
+        ========================================= */
+
+        #header {
+            transition:
+                background .35s ease,
+                box-shadow .35s ease,
+                height .35s ease;
+        }
+
+        #header.scrolled {
+            background: rgba(255, 255, 255, .97);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 8px 35px rgba(0, 0, 0, .08);
+        }
+
+        .logo-white {
+            display: block;
+        }
+
+        .logo-blue {
+            display: none;
+        }
+
+        #header.scrolled .logo-white {
+            display: none;
+        }
+
+        #header.scrolled .logo-blue {
+            display: block;
+        }
+
+        .nav-link {
+            color: white;
+            transition: color .25s ease;
+        }
+
+        #header.scrolled .nav-link {
+            color: #06111F;
+        }
+
+        #header.scrolled .nav-link:hover {
+            color: #FC0109;
+        }
+
+        /* =========================================
+           HERO
+        ========================================= */
+
+        .hero-overlay {
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(3, 13, 29, .98) 0%,
+                    rgba(3, 20, 45, .91) 38%,
+                    rgba(1, 45, 105, .48) 72%,
+                    rgba(1, 45, 105, .20) 100%
+                );
+        }
+
+        .hero-image {
+            transform: scale(1.02);
+            animation: heroZoom 12s ease-out forwards;
+        }
+
+        @keyframes heroZoom {
+            from {
+                transform: scale(1.06);
+            }
+
+            to {
+                transform: scale(1.02);
+            }
+        }
+
+        /* =========================================
+           BOTÕES
+        ========================================= */
+
+        .btn-red {
+            background: #FC0109;
+            color: #fff;
+            transition: all .25s ease;
+        }
+
+        .btn-red:hover {
+            background: #D90007;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(252, 1, 9, .25);
+        }
+
+        .btn-blue {
+            background: #012D69;
+            color: #fff;
+            transition: all .25s ease;
+        }
+
+        .btn-blue:hover {
+            background: #0A3F8F;
+            transform: translateY(-2px);
+        }
+
+        /* =========================================
+           LINHAS
+        ========================================= */
+
+        .red-line {
+            width: 48px;
+            height: 4px;
+            background: #FC0109;
+            flex-shrink: 0;
+        }
+
+        .blue-line {
+            width: 48px;
+            height: 4px;
+            background: #012D69;
+            flex-shrink: 0;
+        }
+
+        /* =========================================
+           CARDS
+        ========================================= */
+
+        .service-card {
+            border: 1px solid #e6ebf1;
+            transition: all .35s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(1, 45, 105, .20);
+            box-shadow: 0 25px 60px rgba(1, 45, 105, .10);
+        }
+
+        .service-icon {
+            transition: all .3s ease;
+        }
+
+        .service-card:hover .service-icon {
+            background: #FC0109;
+            transform: translateY(-3px);
+        }
+
+        /* =========================================
+           IMAGENS
+        ========================================= */
+
+        .image-card {
+            overflow: hidden;
+        }
+
+        .image-card img {
+            transition: transform .7s ease;
+        }
+
+        .image-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* =========================================
+           NÚMEROS
+        ========================================= */
+
+        .number {
+            letter-spacing: -.07em;
+        }
+
+        /* =========================================
+           TIMELINE
+        ========================================= */
+
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 8px;
+            top: 5px;
+            bottom: 5px;
+            width: 1px;
+            background: rgba(255,255,255,.16);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 40px;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 6px;
+            width: 13px;
+            height: 13px;
+            background: #FC0109;
+            border: 3px solid #06111F;
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        /* =========================================
+           DOCUMENTOS
+        ========================================= */
+
+        .document-card {
+            transition: all .3s ease;
+        }
+
+        .document-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(252, 1, 9, .35);
+        }
+
+        /* =========================================
+           MOBILE
+        ========================================= */
+
+        #mobileMenu {
+            display: none;
+        }
+
+        #mobileMenu.active {
+            display: block;
+        }
+
+    </style>
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header
+    id="header"
+    class="fixed top-0 left-0 right-0 z-50"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="h-24 flex items-center justify-between">
+
+            <!-- LOGO BRANCA / AZUL -->
+
+            <a href="#" class="flex items-center">
+
+                <!-- Logo branca no Hero -->
+                <img
+                    src="logobranca.png"
+                    alt="Ellenco"
+                    class="logo-white w-[145px] md:w-[175px] h-auto"
+                >
+
+                <!-- Logo azul depois do scroll -->
+                <img
+                    src="logo.png"
+                    alt="Ellenco"
+                    class="logo-blue w-[145px] md:w-[175px] h-auto"
+                >
+
+            </a>
+
+
+            <!-- MENU DESKTOP -->
+
+            <nav class="hidden lg:flex items-center gap-8">
+
+                <a href="#empresa" class="nav-link text-sm font-semibold">
+                    A Ellenco
+                </a>
+
+                <a href="#solucoes" class="nav-link text-sm font-semibold">
+                    Soluções
+                </a>
+
+                <a href="#usinas" class="nav-link text-sm font-semibold">
+                    Usinas
+                </a>
+
+                <a href="#historia" class="nav-link text-sm font-semibold">
+                    História
+                </a>
+
+                <a href="#valores" class="nav-link text-sm font-semibold">
+                    Valores
+                </a>
+
+                <a href="#compliance" class="nav-link text-sm font-semibold">
+                    Compliance
+                </a>
+
+            </nav>
+
+
+            <!-- CONTATO -->
+
+            <a
+                href="#contato"
+                class="hidden md:flex btn-red px-6 py-3.5 rounded-full text-sm font-bold items-center gap-2"
+            >
+
+                Entre em contato
+
+                <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+
+            </a>
+
+
+            <!-- MOBILE -->
+
+            <button
+                id="mobileButton"
+                class="lg:hidden text-white"
+            >
+
+                <i data-lucide="menu" class="w-7 h-7"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- MENU MOBILE -->
+
+        <div
+            id="mobileMenu"
+            class="lg:hidden bg-white rounded-2xl shadow-xl mb-4 overflow-hidden"
+        >
+
+            <div class="p-6 flex flex-col gap-5">
+
+                <a href="#empresa" class="font-semibold">
+                    A Ellenco
+                </a>
+
+                <a href="#solucoes" class="font-semibold">
+                    Soluções
+                </a>
+
+                <a href="#usinas" class="font-semibold">
+                    Usinas
+                </a>
+
+                <a href="#historia" class="font-semibold">
+                    História
+                </a>
+
+                <a href="#valores" class="font-semibold">
+                    Valores
+                </a>
+
+                <a href="#compliance" class="font-semibold">
+                    Compliance
+                </a>
+
+                <a
+                    href="#contato"
+                    class="btn-red text-center py-3 rounded-xl font-bold"
+                >
+                    Entre em contato
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</header>
+
+
+
+<!-- =====================================================
+     HERO
+===================================================== -->
+
+<section
+    class="relative min-h-screen flex items-center overflow-hidden"
+>
+
+    <img
+        src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&w=2200&q=90"
+        alt="Construção e infraestrutura"
+        class="hero-image absolute inset-0 w-full h-full object-cover z-0"
+    >
+
+
+    <div class="hero-overlay absolute inset-0 z-10"></div>
+
+
+    <div class="relative z-20 max-w-7xl mx-auto px-6 w-full pt-32 pb-20">
+
+        <div class="max-w-4xl">
+
+            <div class="flex items-center gap-4 mb-8">
+
+                <div class="red-line"></div>
+
+                <span
+                    class="text-white/80 text-xs font-bold uppercase tracking-[.25em]"
+                >
+                    Desde 1951
+                </span>
+
+            </div>
+
+
+            <h1
+                class="text-white text-5xl md:text-7xl lg:text-[86px] font-black tracking-[-.065em] leading-[.93]"
+            >
+
+                Construindo
+
+                <br>
+
+                caminhos.
+
+                <br>
+
+                <span class="text-ellenco-red">
+                    Construindo
+                </span>
+
+                <br>
+
+                sonhos.
+
+            </h1>
+
+
+            <p
+                class="mt-8 max-w-2xl text-white/75 text-lg md:text-xl leading-relaxed"
+            >
+
+                Há décadas transformando engenharia, infraestrutura
+                e gestão em soluções que impulsionam cidades,
+                empresas e pessoas.
+
+            </p>
+
+
+            <div class="mt-10 flex flex-col sm:flex-row gap-4">
+
+                <a
+                    href="#solucoes"
+                    class="btn-red rounded-full px-7 py-4 font-bold flex items-center justify-center gap-2"
+                >
+
+                    Conheça nossas soluções
+
+                    <i data-lucide="arrow-down" class="w-5 h-5"></i>
+
+                </a>
+
+
+                <a
+                    href="#empresa"
+                    class="border border-white/30 text-white rounded-full px-7 py-4 font-semibold flex items-center justify-center gap-2 hover:bg-white/10 transition"
+                >
+
+                    Conheça a Ellenco
+
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="hidden lg:flex absolute bottom-10 right-10 items-center gap-4 text-white/50 text-xs uppercase tracking-[.2em]"
+        >
+
+            <span>
+                Infraestrutura
+            </span>
+
+            <div class="w-12 h-px bg-white/30"></div>
+
+            <span>
+                Engenharia
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     NÚMEROS
+===================================================== -->
+
+<section class="bg-ellenco-blue text-white">
+
+    <div class="max-w-7xl mx-auto px-6 py-16">
+
+        <div
+            class="grid grid-cols-2 lg:grid-cols-4 gap-y-12 lg:gap-y-0 lg:divide-x divide-white/15"
+        >
+
+            <div class="lg:px-10 first:pl-0">
+
+                <div class="number text-5xl md:text-6xl font-black">
+                    75+
+                </div>
+
+                <p class="mt-3 text-white/60 text-sm">
+                    anos de história
+                </p>
+
+            </div>
+
+
+            <div class="lg:px-10">
+
+                <div class="number text-5xl md:text-6xl font-black">
+                    7M+
+                </div>
+
+                <p class="mt-3 text-white/60 text-sm">
+                    m² urbanizados
+                </p>
+
+            </div>
+
+
+            <div class="lg:px-10">
+
+                <div class="number text-5xl md:text-6xl font-black">
+                    16K+
+                </div>
+
+                <p class="mt-3 text-white/60 text-sm">
+                    famílias atendidas
+                </p>
+
+            </div>
+
+
+            <div class="lg:px-10">
+
+                <div class="number text-5xl md:text-6xl font-black">
+                    4,5M+
+                </div>
+
+                <p class="mt-3 text-white/60 text-sm">
+                    m² de pavimentação
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SOBRE
+===================================================== -->
+
+<section
+    id="empresa"
+    class="py-28 md:py-36 bg-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+
+            <div>
+
+                <div class="flex items-center gap-4 mb-7">
+
+                    <div class="blue-line"></div>
+
+                    <span
+                        class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                    >
+                        A Ellenco
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="text-4xl md:text-6xl font-black tracking-[-.055em] leading-tight"
+                >
+
+                    Experiência que
+                    <span class="text-ellenco-blue">
+                        continua evoluindo.
+                    </span>
+
+                </h2>
+
+
+                <p class="mt-7 text-gray-600 text-lg leading-relaxed">
+
+                    Um grupo de pessoas e empresas com vocação para a
+                    gestão e provedor de soluções para seus clientes.
+
+                    A Ellenco atua nas áreas de infraestrutura,
+                    pavimentação, usinas de asfalto, empreendimentos
+                    imobiliários e geração de empregos.
+
+                </p>
+
+
+                <p class="mt-5 text-gray-600 leading-relaxed">
+
+                    Com 75 anos de tradição, a empresa continua se
+                    reinventando e inovando, mantendo como pilares
+                    a segurança, a qualidade e o compromisso com o
+                    desenvolvimento do país.
+
+                </p>
+
+
+                <div class="mt-8 flex items-center gap-3">
+
+                    <div
+                        class="w-10 h-10 rounded-full bg-ellenco-blue flex items-center justify-center text-white"
+                    >
+
+                        <i data-lucide="check" class="w-5 h-5"></i>
+
+                    </div>
+
+                    <span class="font-semibold">
+                        Construindo caminhos e sonhos desde 1951.
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <div class="relative">
+
+                <div
+                    class="absolute -top-5 -left-5 w-24 h-24 border-l-4 border-t-4 border-ellenco-red z-10"
+                ></div>
+
+
+                <img
+                    src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?auto=format&fit=crop&w=1400&q=90"
+                    alt="Obra de infraestrutura"
+                    class="w-full h-[540px] object-cover rounded-2xl"
+                >
+
+
+                <div
+                    class="absolute -bottom-7 -right-7 bg-ellenco-blue text-white p-7 rounded-2xl shadow-2xl max-w-xs"
+                >
+
+                    <div class="text-ellenco-red text-4xl font-black">
+                        1951
+                    </div>
+
+                    <p class="mt-2 text-white/70 text-sm leading-relaxed">
+                        O início de uma história construída com trabalho,
+                        união e inovação.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     SOLUÇÕES
+===================================================== -->
+
+<section
+    id="solucoes"
+    class="py-28 md:py-36 bg-ellenco-gray"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="max-w-3xl mb-16">
+
+            <div class="flex items-center gap-4 mb-7">
+
+                <div class="red-line"></div>
+
+                <span
+                    class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                >
+                    Nossas empresas
+                </span>
+
+            </div>
+
+
+            <h2
+                class="text-4xl md:text-6xl font-black tracking-[-.055em]"
+            >
+
+                Soluções para
+
+                <span class="text-ellenco-blue">
+                    grandes desafios.
+                </span>
+
+            </h2>
+
+
+            <p class="mt-6 text-gray-500 text-lg leading-relaxed">
+
+                Diferentes áreas de atuação que trabalham juntas para
+                entregar soluções completas em infraestrutura e
+                desenvolvimento.
+
+            </p>
+
+        </div>
+
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+
+
+            <!-- CONSTRUÇÕES -->
+
+            <div class="service-card bg-white rounded-3xl p-8">
+
+                <div
+                    class="service-icon w-14 h-14 rounded-2xl bg-ellenco-blue text-white flex items-center justify-center mb-8"
+                >
+
+                    <i data-lucide="construction" class="w-7 h-7"></i>
+
+                </div>
+
+
+                <h3 class="text-xl font-bold">
+                    Construções
+                </h3>
+
+
+                <p class="text-gray-500 mt-4 leading-relaxed text-sm">
+
+                    Pavimentação rodoviária, urbana, industrial,
+                    aeroportos e loteamentos, além de terraplanagem,
+                    drenagem, pontes, contenções e sinalização.
+
+                </p>
+
+
+                <a
+                    href="#construcoes"
+                    class="inline-flex mt-7 items-center gap-2 text-ellenco-blue font-bold text-sm"
+                >
+
+                    Conhecer atuação
+
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- LOCAÇÕES -->
+
+            <div class="service-card bg-white rounded-3xl p-8">
+
+                <div
+                    class="service-icon w-14 h-14 rounded-2xl bg-ellenco-blue text-white flex items-center justify-center mb-8"
+                >
+
+                    <i data-lucide="truck" class="w-7 h-7"></i>
+
+                </div>
+
+
+                <h3 class="text-xl font-bold">
+                    Ellenco Locações
+                </h3>
+
+
+                <p class="text-gray-500 mt-4 leading-relaxed text-sm">
+
+                    Gestão especializada de máquinas e equipamentos
+                    com qualidade, agilidade e eficiência.
+
+                </p>
+
+
+                <a
+                    href="#locacoes"
+                    class="inline-flex mt-7 items-center gap-2 text-ellenco-blue font-bold text-sm"
+                >
+
+                    Conhecer atuação
+
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- PARTICIPAÇÕES -->
+
+            <div class="service-card bg-white rounded-3xl p-8">
+
+                <div
+                    class="service-icon w-14 h-14 rounded-2xl bg-ellenco-blue text-white flex items-center justify-center mb-8"
+                >
+
+                    <i data-lucide="building-2" class="w-7 h-7"></i>
+
+                </div>
+
+
+                <h3 class="text-xl font-bold">
+                    Participações
+                </h3>
+
+
+                <p class="text-gray-500 mt-4 leading-relaxed text-sm">
+
+                    Projetos estruturados e experiência em concessões
+                    de rodovias.
+
+                </p>
+
+
+                <a
+                    href="#participacoes"
+                    class="inline-flex mt-7 items-center gap-2 text-ellenco-blue font-bold text-sm"
+                >
+
+                    Conhecer atuação
+
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+                </a>
+
+            </div>
+
+
+
+            <!-- USINAS -->
+
+            <div class="service-card bg-white rounded-3xl p-8">
+
+                <div
+                    class="service-icon w-14 h-14 rounded-2xl bg-ellenco-blue text-white flex items-center justify-center mb-8"
+                >
+
+                    <i data-lucide="factory" class="w-7 h-7"></i>
+
+                </div>
+
+
+                <h3 class="text-xl font-bold">
+                    Usinas
+                </h3>
+
+
+                <p class="text-gray-500 mt-4 leading-relaxed text-sm">
+
+                    Produção de materiais para pavimentação com alto
+                    controle tecnológico.
+
+                </p>
+
+
+                <a
+                    href="#usinas"
+                    class="inline-flex mt-7 items-center gap-2 text-ellenco-blue font-bold text-sm"
+                >
+
+                    Conhecer unidades
+
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CONSTRUÇÕES
+===================================================== -->
+
+<section
+    id="construcoes"
+    class="py-28 md:py-36 bg-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+            <div class="image-card rounded-3xl">
+
+                <img
+                    src="https://images.pexels.com/photos/2383650/pexels-photo-2383650.jpeg"
+                    alt="Infraestrutura e pavimentação"
+                    class="w-full h-[560px] object-cover rounded-3xl"
+                >
+
+            </div>
+
+
+            <div>
+
+                <div class="flex items-center gap-4 mb-7">
+
+                    <div class="red-line"></div>
+
+                    <span
+                        class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                    >
+                        Construções
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="text-4xl md:text-5xl font-black tracking-[-.055em]"
+                >
+
+                    Infraestrutura do
+                    <span class="text-ellenco-blue">
+                        começo ao fim.
+                    </span>
+
+                </h2>
+
+
+                <p class="mt-7 text-gray-600 text-lg leading-relaxed">
+
+                    Especializada em construções através de pavimentação
+                    rodoviária, urbana, industrial, aeroportos e
+                    loteamentos.
+
+                </p>
+
+
+                <p class="mt-5 text-gray-500 leading-relaxed">
+
+                    A Ellenco oferece serviço completo, incluindo
+                    terraplanagem, pavimentação, drenagem, pontes,
+                    contenções, guias, sarjetas, sinalização e
+                    paisagismo.
+
+                </p>
+
+
+                <p class="mt-5 text-gray-500 leading-relaxed">
+
+                    A empresa também investe em novas tecnologias,
+                    como asfalto polímero, asfalto borracha e
+                    micropavimento, além de soluções ambientais como
+                    fresagem e reciclagem do pavimento.
+
+                </p>
+
+
+                <div class="grid grid-cols-2 gap-4 mt-8">
+
+                    <div class="border border-gray-200 rounded-2xl p-5">
+
+                        <i
+                            data-lucide="shield-check"
+                            class="w-7 h-7 text-ellenco-red"
+                        ></i>
+
+                        <p class="font-bold mt-3">
+                            Segurança
+                        </p>
+
+                    </div>
+
+
+                    <div class="border border-gray-200 rounded-2xl p-5">
+
+                        <i
+                            data-lucide="leaf"
+                            class="w-7 h-7 text-ellenco-red"
+                        ></i>
+
+                        <p class="font-bold mt-3">
+                            Sustentabilidade
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     LOCAÇÕES
+===================================================== -->
+
+<section
+    id="locacoes"
+    class="py-28 md:py-36 bg-ellenco-gray"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-2 gap-16 items-center">
+
+            <div class="order-2 lg:order-1">
+
+                <div class="flex items-center gap-4 mb-7">
+
+                    <div class="blue-line"></div>
+
+                    <span
+                        class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                    >
+                        Ellenco Locações
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="text-4xl md:text-5xl font-black tracking-[-.055em]"
+                >
+
+                    Equipamentos preparados
+                    <span class="text-ellenco-blue">
+                        para grandes obras.
+                    </span>
+
+                </h2>
+
+
+                <p class="mt-7 text-gray-600 text-lg leading-relaxed">
+
+                    Criada em 2010, a Ellenco Locações nasceu com o
+                    objetivo de oferecer gestão especializada de
+                    máquinas e equipamentos.
+
+                </p>
+
+
+                <p class="mt-5 text-gray-500 leading-relaxed">
+
+                    Através dela, a Ellenco conta com equipamentos
+                    sempre preparados para oferecer desempenho,
+                    qualidade, agilidade e eficiência na execução
+                    dos serviços de infraestrutura e pavimentação.
+
+                </p>
+
+
+                <div class="mt-8 flex items-center gap-4">
+
+                    <div
+                        class="w-12 h-12 bg-ellenco-blue rounded-xl flex items-center justify-center text-white"
+                    >
+
+                        <i data-lucide="settings" class="w-6 h-6"></i>
+
+                    </div>
+
+                    <div>
+
+                        <p class="font-bold">
+                            Gestão especializada
+                        </p>
+
+                        <p class="text-sm text-gray-500">
+                            Máquinas e equipamentos preparados.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="image-card rounded-3xl order-1 lg:order-2">
+
+                <img
+                    src="https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?auto=format&fit=crop&w=1400&q=90"
+                    alt="Máquinas e equipamentos"
+                    class="w-full h-[520px] object-cover rounded-3xl"
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     PARTICIPAÇÕES
+===================================================== -->
+
+<section
+    id="participacoes"
+    class="py-28 md:py-36 bg-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="max-w-4xl">
+
+            <div class="flex items-center gap-4 mb-7">
+
+                <div class="red-line"></div>
+
+                <span
+                    class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                >
+                    Ellenco Participações
+                </span>
+
+            </div>
+
+
+            <h2
+                class="text-4xl md:text-6xl font-black tracking-[-.055em]"
+            >
+
+                Projetos estruturados
+                <span class="text-ellenco-blue">
+                    para o futuro.
+                </span>
+
+            </h2>
+
+
+            <p
+                class="mt-7 text-gray-600 text-lg leading-relaxed max-w-3xl"
+            >
+
+                A Ellenco Participações tem como missão o estudo e
+                desenvolvimento de projetos estruturados, possuindo
+                know-how em concessões de rodovias.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="mt-16 bg-ellenco-blue rounded-3xl overflow-hidden"
+        >
+
+            <div class="grid lg:grid-cols-2">
+
+                <div class="p-9 md:p-14">
+
+                    <div class="text-ellenco-red font-black text-5xl">
+                        BR-050
+                    </div>
+
+
+                    <h3 class="text-white text-2xl font-bold mt-5">
+                        Consórcio Planalto
+                    </h3>
+
+
+                    <p class="text-white/60 mt-5 leading-relaxed">
+
+                        Durante cinco anos, a Ellenco constituiu junto
+                        com outras empresas do segmento o Consórcio
+                        Planalto, correspondente à BR-050/GO/MG,
+                        participando da MGO Rodovias — Concessionária
+                        de Rodovias Minas Gerais Goiás S/A.
+
+                    </p>
+
+
+                    <p class="text-white/60 mt-5 leading-relaxed">
+
+                        A concessão esteve relacionada à administração,
+                        recuperação, conservação, manutenção, ampliação
+                        e operação da BR-050.
+
+                    </p>
+
+                </div>
+
+
+                <div class="min-h-[420px]">
+
+                    <img
+                        src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=1400&q=90"
+                        alt="Rodovia"
+                        class="w-full h-full object-cover"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     USINAS
+===================================================== -->
+
+<section
+    id="usinas"
+    class="py-28 md:py-36 bg-ellenco-dark text-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="max-w-4xl mb-16">
+
+            <div class="flex items-center gap-4 mb-7">
+
+                <div class="red-line"></div>
+
+                <span
+                    class="text-white/50 text-xs font-bold uppercase tracking-[.25em]"
+                >
+                    Usinas de Asfalto
+                </span>
+
+            </div>
+
+
+            <h2
+                class="text-4xl md:text-6xl font-black tracking-[-.055em]"
+            >
+
+                Tecnologia e controle
+                <span class="text-white/40">
+                    em cada tonelada.
+                </span>
+
+            </h2>
+
+
+            <p
+                class="mt-6 text-white/55 text-lg leading-relaxed"
+            >
+
+                As usinas de asfalto da Ellenco oferecem materiais
+                para aplicação em pavimentação com diferentes faixas
+                granulométricas e alto controle tecnológico.
+
+            </p>
+
+        </div>
+
+
+        <!-- UNIDADE FIXA -->
+
+        <div
+            class="bg-white/5 border border-white/10 rounded-3xl overflow-hidden"
+        >
+
+            <div class="grid lg:grid-cols-2">
+
+                <div class="p-9 md:p-14">
+
+                    <span
+                        class="inline-flex px-4 py-2 bg-ellenco-red rounded-full text-xs font-bold uppercase tracking-wider"
+                    >
+                        Unidade fixa
+                    </span>
+
+
+                    <h3 class="text-3xl font-black mt-7">
+                        Usina Gravimétrica — Terex
+                    </h3>
+
+
+                    <p class="text-white/60 mt-5 leading-relaxed">
+
+                        Fornecemos material para qualquer tamanho
+                        de cliente, com estrutura preparada para
+                        atender diferentes demandas de pavimentação.
+
+                    </p>
+
+
+                    <div class="mt-8 space-y-4">
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                Capacidade de 120 ton/hora
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                Filtros de Manga
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                4 Silos para Agregados
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                3 tanques para armazenamento de CAP
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                Balança Eletrônica
+                            </span>
+
+                        </div>
+
+
+                        <div class="flex gap-3">
+
+                            <i
+                                data-lucide="check"
+                                class="text-ellenco-red w-5 h-5 flex-shrink-0"
+                            ></i>
+
+                            <span class="text-white/70">
+                                Laboratório
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mt-8 pt-7 border-t border-white/10">
+
+                        <p class="text-xs text-white/40 uppercase tracking-wider">
+                            Licenças CETESB
+                        </p>
+
+                        <p class="text-white/70 mt-2">
+                            Instalação · Funcionamento · Operação
+                        </p>
+
+                    </div>
+
+
+                    <div class="mt-6 flex gap-3">
+
+                        <i
+                            data-lucide="map-pin"
+                            class="w-5 h-5 text-ellenco-red flex-shrink-0"
+                        ></i>
+
+                        <p class="text-white/50 text-sm leading-relaxed">
+
+                            Av. Antonio Bardella, 3444<br>
+                            Jd. Iporanga — Sorocaba/SP<br>
+                            CEP 18085-852
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="min-h-[500px]">
+
+                    <img
+                        src="https://ellenco.com.br/uploads/fotoUsina/usina-a4c73935a86cdcc5aac7cab1d986c45e.jpg"
+                        alt="Usina Gravimétrica Terex"
+                        class="w-full h-full object-cover"
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- UNIDADES MÓVEIS -->
+
+        <div class="mt-8">
+
+            <div class="mb-10">
+
+                <span class="text-ellenco-red font-bold uppercase text-xs tracking-[.25em]">
+                    Unidades móveis
+                </span>
+
+                <h3 class="text-3xl md:text-4xl font-black mt-4">
+                    Estrutura onde a obra precisa.
+                </h3>
+
+            </div>
+
+
+            <div class="grid md:grid-cols-2 gap-6">
+
+
+                <!-- AMMANN 140 -->
+
+                <div
+                    class="border border-white/10 rounded-3xl overflow-hidden bg-white/5"
+                >
+
+                    <div class="h-64">
+
+                        <img
+                            src="https://ellenco.com.br/uploads/fotoUsina/usina-f3f0fc0b15e33043b1a913e814ea2175.jpg"
+                            alt="Usina Ammann ACM 140 Prime"
+                            class="w-full h-full object-cover"
+                        >
+
+                    </div>
+
+
+                    <div class="p-7">
+
+                        <span class="text-ellenco-red text-xs font-bold uppercase">
+                            Unidade móvel
+                        </span>
+
+
+                        <h4 class="text-xl font-bold mt-3">
+                            Usina Ammann ACM 140 Prime
+                        </h4>
+
+
+                        <p class="text-white/50 text-sm mt-4 leading-relaxed">
+
+                            Duas Usinas Ammann ACM 140 Prime,
+                            com capacidade de 140 ton/hora,
+                            filtros de manga, quatro silos para
+                            agregados e dois tanques verticais
+                            para armazenamento de CAP.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- TEREX -->
+
+                <div
+                    class="border border-white/10 rounded-3xl overflow-hidden bg-white/5"
+                >
+
+                    <div class="h-64">
+
+                        <img
+                            src="https://ellenco.com.br/uploads/fotoUsina/usina-13742ca9a5d28917c9e91c118c2930cd.jpg"
+                            alt="Usina Terex Magnum 140"
+                            class="w-full h-full object-cover"
+                        >
+
+                    </div>
+
+
+                    <div class="p-7">
+
+                        <span class="text-ellenco-red text-xs font-bold uppercase">
+                            Unidade móvel
+                        </span>
+
+
+                        <h4 class="text-xl font-bold mt-3">
+                            Usina Terex Magnum 140
+                        </h4>
+
+
+                        <p class="text-white/50 text-sm mt-4 leading-relaxed">
+
+                            Usina Terex Magnum 140 com capacidade
+                            de 140 ton/hora, filtros de manga e
+                            quatro silos para agregados.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     HISTÓRIA
+===================================================== -->
+
+<section
+    id="historia"
+    class="py-28 md:py-36 bg-ellenco-dark text-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="grid lg:grid-cols-2 gap-20">
+
+            <div>
+
+                <div class="flex items-center gap-4 mb-7">
+
+                    <div class="red-line"></div>
+
+                    <span class="text-white/50 text-xs font-bold uppercase tracking-[.25em]">
+                        Nossa trajetória
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="text-4xl md:text-6xl font-black tracking-[-.055em]"
+                >
+
+                    Uma história
+
+                    <span class="text-white/35">
+                        construída ao longo do tempo.
+                    </span>
+
+                </h2>
+
+
+                <p class="mt-7 text-white/55 text-lg leading-relaxed">
+
+                    A pequena oficina eletrotécnica criada em 1951,
+                    em Tatuí, cresceu, mudou, se reinventou e
+                    continua inovando em infraestrutura e
+                    incorporação.
+
+                </p>
+
+            </div>
+
+
+            <div class="timeline space-y-12">
+
+
+                <div class="timeline-item">
+
+                    <div class="text-ellenco-red font-black text-2xl">
+                        1951
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-2">
+                        O começo
+                    </h3>
+
+                    <p class="text-white/45 mt-3 leading-relaxed">
+                        Uma pequena oficina eletrotécnica em Tatuí
+                        dá início à trajetória da Ellenco.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <div class="text-ellenco-red font-black text-2xl">
+                        2010
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-2">
+                        Ellenco Locações
+                    </h3>
+
+                    <p class="text-white/45 mt-3 leading-relaxed">
+                        Criação da Ellenco Locações para gestão
+                        especializada de máquinas e equipamentos.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <div class="text-ellenco-red font-black text-2xl">
+                        EXPANSÃO
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-2">
+                        Novos caminhos
+                    </h3>
+
+                    <p class="text-white/45 mt-3 leading-relaxed">
+                        Ampliação da atuação em infraestrutura,
+                        pavimentação, usinas, locações e projetos
+                        estruturados.
+                    </p>
+
+                </div>
+
+
+                <div class="timeline-item">
+
+                    <div class="text-ellenco-red font-black text-2xl">
+                        HOJE
+                    </div>
+
+                    <h3 class="text-xl font-bold mt-2">
+                        Construindo o futuro
+                    </h3>
+
+                    <p class="text-white/45 mt-3 leading-relaxed">
+                        Uma empresa genuinamente brasileira,
+                        comprometida com inovação e desenvolvimento.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     VALORES
+===================================================== -->
+
+<section
+    id="valores"
+    class="py-28 md:py-36 bg-white"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div class="max-w-3xl mb-16">
+
+            <div class="flex items-center gap-4 mb-7">
+
+                <div class="blue-line"></div>
+
+                <span
+                    class="text-ellenco-blue text-xs font-bold uppercase tracking-[.25em]"
+                >
+                    Nossos valores
+                </span>
+
+            </div>
+
+
+            <h2
+                class="text-4xl md:text-6xl font-black tracking-[-.055em]"
+            >
+
+                O que construímos
+                <span class="text-gray-400">
+                    começa por dentro.
+                </span>
+
+            </h2>
+
+        </div>
+
+
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    01
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    União
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Trabalhar em equipe e praticar o companheirismo.
+                </p>
+
+            </div>
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    02
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Ética
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Agir de acordo com os valores morais da Ellenco.
+                </p>
+
+            </div>
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    03
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Respeito
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Reconhecer e tratar todos com igualdade.
+                </p>
+
+            </div>
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    04
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Comprometimento
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Envolver-se e participar dos objetivos da Ellenco.
+                </p>
+
+            </div>
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    05
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Responsabilidade
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Atingir metas e prazos acordados.
+                </p>
+
+            </div>
+
+
+            <div class="bg-ellenco-gray rounded-2xl p-7">
+
+                <span class="text-ellenco-red font-black">
+                    06
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Satisfação do Cliente
+                </h3>
+
+                <p class="text-gray-500 mt-3 text-sm leading-relaxed">
+                    Trabalhar para exceder as expectativas dos clientes.
+                </p>
+
+            </div>
+
+
+            <div
+                class="bg-ellenco-blue text-white rounded-2xl p-7 sm:col-span-2"
+            >
+
+                <span class="text-ellenco-red font-black">
+                    07
+                </span>
+
+                <h3 class="text-xl font-bold mt-5">
+                    Resultado econômico, social e ambiental
+                </h3>
+
+                <p class="text-white/60 mt-3 text-sm leading-relaxed">
+
+                    Gerar valor econômico simultaneamente à satisfação
+                    de clientes e colaboradores, preservando o meio ambiente.
+
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     COMPLIANCE
+===================================================== -->
+
+<section
+    id="compliance"
+    class="py-28 md:py-36 bg-ellenco-gray"
+>
+
+    <div class="max-w-7xl mx-auto px-6">
+
+        <div
+            class="grid lg:grid-cols-2 bg-ellenco-blue rounded-[2rem] overflow-hidden"
+        >
+
+            <div class="p-9 md:p-14 lg:p-16">
+
+                <div class="flex items-center gap-4 mb-7">
+
+                    <div class="red-line"></div>
+
+                    <span class="text-white/50 text-xs font-bold uppercase tracking-[.25em]">
+                        Compliance
+                    </span>
+
+                </div>
+
+
+                <h2
+                    class="text-4xl md:text-5xl font-black text-white/100 tracking-[-.055em]"
+                >
+
+                    Integridade como
+                    <span class="text-ellenco-red">
+                        princípio.
+                    </span>
+
+                </h2>
+
+
+                <p class="mt-6 text-white/60 text-lg leading-relaxed">
+
+                    O programa de Compliance da Ellenco tem como
+                    objetivo demonstrar maior transparência nos
+                    negócios e assegurar a integridade da empresa
+                    perante o mercado.
+
+                </p>
+
+
+                <p class="mt-5 text-white/50 leading-relaxed">
+
+                    A Ellenco reforça a ética e a transparência em
+                    tudo que faz, seguindo os princípios estabelecidos
+                    na Lei Anticorrupção.
+
+                </p>
+
+
+                <a
+                    href="https://ellenco.com.br/compliance"
+                    target="_blank"
+                    class="inline-flex items-center gap-2 mt-8 bg-white text-ellenco-blue px-6 py-4 rounded-full font-bold hover:bg-gray-100 transition"
+                >
+
+                    Acessar Compliance
+
+                    <i data-lucide="arrow-up-right" class="w-5 h-5"></i>
+
+                </a>
+
+            </div>
+
+
+            <div class="bg-ellenco-dark p-9 md:p-14">
+
+                <h3 class="text-white text-xl font-bold mb-7">
+                    Políticas e documentos
+                </h3>
+
+
+                <div class="grid gap-3">
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/compliance3.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="file-text"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Código de Ética e Conduta
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-003v30-Politica-de-Relacionamento-com-o-Setor-Publico-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="file-text"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Relacionamento com o Setor Público
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-004v30-Politica-de-Relacionamento-com-Concorrentes-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="file-text"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Relacionamento com Concorrentes
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-001v10-Politica-Antissuborno-Ellenco-Construcoes-08072025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="shield-check"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política Antissuborno
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-007v30-Politica-de-Consequencias-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="scale"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Consequências
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-005v30-Politica-de-Cortesias-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="gift"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Cortesias
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-006v30-Politica-de-Doacoes-e-Patrocinios-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="heart-handshake"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Doações e Patrocínios
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+
+
+                    <a
+                        href="https://ellenco.com.br/uploads/compliance/arquivo/2026/POL-008v30-Politica-de-Prevencao-a-Lavagem-de-Dinheiro-Ellenco-Construcoes-18092025.pdf"
+                        target="_blank"
+                        class="document-card border border-white/10 rounded-xl p-5 flex items-center justify-between gap-4"
+                    >
+
+                        <div class="flex items-center gap-4">
+
+                            <div
+                                class="w-10 h-10 rounded-lg bg-ellenco-red/10 flex items-center justify-center"
+                            >
+
+                                <i
+                                    data-lucide="landmark"
+                                    class="w-5 h-5 text-ellenco-red"
+                                ></i>
+
+                            </div>
+
+                            <span class="text-white/80 text-sm font-medium">
+                                Política de Prevenção à Lavagem de Dinheiro
+                            </span>
+
+                        </div>
+
+
+                        <i
+                            data-lucide="arrow-up-right"
+                            class="w-4 h-4 text-white/40"
+                        ></i>
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CANAL -->
+
+        <div class="mt-8 bg-white rounded-3xl p-8 md:p-10 border border-gray-200">
+
+            <div class="grid md:grid-cols-[auto_1fr_auto] gap-6 items-center">
+
+                <div
+                    class="w-14 h-14 rounded-2xl bg-ellenco-red/10 flex items-center justify-center"
+                >
+
+                    <i
+                        data-lucide="message-square-warning"
+                        class="w-7 h-7 text-ellenco-red"
+                    ></i>
+
+                </div>
+
+
+                <div>
+
+                    <h3 class="font-bold text-xl">
+                        Canal de denúncias
+                    </h3>
+
+                    <p class="text-gray-500 mt-2 leading-relaxed">
+
+                        O canal é operado por empresa independente,
+                        garantindo o anonimato da denúncia. O serviço
+                        é gratuito e está disponível em horário comercial.
+
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="http://denuncieonline.azurewebsites.net/CDs/Ellenco/Ellenco.html"
+                    target="_blank"
+                    class="btn-red px-6 py-3.5 rounded-full font-bold whitespace-nowrap"
+                >
+
+                    Acessar canal
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     CONTATO
+===================================================== -->
+
+<section
+    id="contato"
+    class="relative py-32 overflow-hidden"
+>
+
+    <img
+        src="https://images.unsplash.com/photo-1541971875076-8f970d573be6?auto=format&fit=crop&w=2200&q=90"
+        alt="Construção"
+        class="absolute inset-0 w-full h-full object-cover"
+    >
+
+
+    <div class="absolute inset-0 bg-ellenco-blue/90"></div>
+
+
+    <div
+        class="relative z-10 max-w-5xl mx-auto px-6 text-center"
+    >
+
+        <div class="flex justify-center mb-7">
+
+            <div class="red-line"></div>
+
+        </div>
+
+
+        <h2
+            class="text-white text-4xl md:text-7xl font-black tracking-[-.06em]"
+        >
+
+            Vamos construir
+
+            <span class="text-ellenco-red">
+                juntos?
+            </span>
+
+        </h2>
+
+
+        <p
+            class="mt-7 text-white/65 text-lg max-w-2xl mx-auto leading-relaxed"
+        >
+
+            Entre em contato com a Ellenco para conhecer nossas
+            soluções, desenvolver uma parceria ou enviar sua mensagem.
+
+        </p>
+
+
+        <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+
+            <a
+                href="https://ellenco.com.br/contato"
+                target="_blank"
+                class="btn-red px-8 py-4 rounded-full font-bold flex items-center justify-center gap-2"
+            >
+
+                Fale conosco
+
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+
+            </a>
+
+
+            <a
+                href="https://wa.me/5515998074887"
+                target="_blank"
+                class="border border-white/30 text-white px-8 py-4 rounded-full font-semibold hover:bg-white/10 transition flex items-center justify-center gap-2"
+            >
+
+                Trabalhe conosco
+
+                <i data-lucide="message-circle" class="w-5 h-5"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="bg-ellenco-dark text-white">
+
+    <div class="max-w-7xl mx-auto px-6 py-16">
+
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-12">
+
+
+            <div class="lg:col-span-2">
+
+                <img
+                    src="logobranca.png"
+                    alt="Ellenco"
+                    class="w-[175px] h-auto"
+                >
+
+
+                <p class="text-white/40 mt-7 max-w-md leading-relaxed">
+
+                    Um grupo de pessoas e empresas com vocação para
+                    gestão, provedor de soluções para clientes e
+                    comprometido com o desenvolvimento do país.
+
+                </p>
+
+            </div>
+
+
+            <div>
+
+                <h3 class="font-bold mb-5">
+                    Empresa
+                </h3>
+
+
+                <div class="space-y-3 text-white/40 text-sm">
+
+                    <a href="#empresa" class="block hover:text-white transition">
+                        A Ellenco
+                    </a>
+
+                    <a href="#solucoes" class="block hover:text-white transition">
+                        Soluções
+                    </a>
+
+                    <a href="#historia" class="block hover:text-white transition">
+                        História
+                    </a>
+
+                    <a href="#valores" class="block hover:text-white transition">
+                        Valores
+                    </a>
+
+                    <a href="#compliance" class="block hover:text-white transition">
+                        Compliance
+                    </a>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <h3 class="font-bold mb-5">
+                    Contato
+                </h3>
+
+
+                <div class="space-y-3 text-white/40 text-sm">
+
+                    <p>
+                        Av. Roberto Simonsen, 47
+                    </p>
+
+                    <p>
+                        Jd. Santa Rosália
+                    </p>
+
+                    <p>
+                        Sorocaba — SP
+                    </p>
+
+                    <p>
+                        CEP 18090-000
+                    </p>
+
+                    <p>
+                        (15) 3331-6880
+                    </p>
+
+                    <p>
+                        sac@ellenco.com.br
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="border-t border-white/10 mt-14 pt-7 flex flex-col md:flex-row justify-between gap-4 text-xs text-white/30"
+        >
+
+            <p>
+                © 2026 Ellenco S/A. Todos os direitos reservados.
+            </p>
+
+            <p>
+                Construindo caminhos e sonhos desde 1951.
+            </p>
+
+        </div>
+
+    </div>
+
+</footer>
+
+
+
+<!-- =====================================================
+     JAVASCRIPT
+===================================================== -->
+
+<script>
+
+    /* ==========================================
+       ÍCONES
+    ========================================== */
+
+    lucide.createIcons();
+
+
+    /* ==========================================
+       HEADER
+    ========================================== */
+
+    const header = document.getElementById('header');
+
+    function updateHeader() {
+
+        if (window.scrollY > 60) {
+
+            header.classList.add('scrolled');
+
+        } else {
+
+            header.classList.remove('scrolled');
+
+        }
+
+    }
+
+    window.addEventListener('scroll', updateHeader);
+
+    updateHeader();
+
+
+    /* ==========================================
+       MENU MOBILE
+    ========================================== */
+
+    const mobileButton =
+        document.getElementById('mobileButton');
+
+    const mobileMenu =
+        document.getElementById('mobileMenu');
+
+
+    mobileButton.addEventListener('click', () => {
+
+        mobileMenu.classList.toggle('active');
+
+    });
+
+
+    /* ==========================================
+       FECHAR MENU
+    ========================================== */
+
+    document
+        .querySelectorAll('#mobileMenu a')
+        .forEach(link => {
+
+            link.addEventListener('click', () => {
+
+                mobileMenu.classList.remove('active');
+
+            });
+
+        });
+
+</script>
+
+
+</body>
+</html>

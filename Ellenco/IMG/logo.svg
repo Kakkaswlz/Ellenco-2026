@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 60" fill="none">
+  <!-- Ellenco Modern Brand Typography -->
+  <text x="5" y="42" font-family="'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif" font-size="38" font-weight="900" font-style="italic" letter-spacing="-1.5" fill="#0A2342">
+    Ellenco<tspan fill="#E51920">.</tspan>
+  </text>
+  <!-- Architectural / Road Accent Submark -->
+  <rect x="185" y="18" width="12" height="26" rx="3" fill="#0A2342" />
+  <rect x="202" y="12" width="12" height="32" rx="3" fill="#123F70" />
+  <rect x="219" y="24" width="12" height="20" rx="3" fill="#E51920" />
+</svg>

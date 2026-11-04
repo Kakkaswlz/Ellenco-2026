@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Equipamentos & Frota Pesada</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <div class="p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto animate-fade-in-up">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-black text-slate-900 tracking-tight">Equipamentos & Frota Pesada</h2>
+                    <p class="text-xs text-slate-500 mt-0.5">Controle de horímetro, consumo médio e disponibilidade mecânica.</p>
+                </div>
+                <button onclick="abrirModalNovoEquipamento()" class="bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all">
+                    <i class="fa-solid fa-plus text-ellenco-red"></i> Cadastrar Equipamento
+                </button>
+            </div>
+
+            <!-- CARDS DE RESUMO DA FROTA -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-slate-500">Frota Total</span>
+                    <h3 id="statTotalFrota" class="text-2xl font-black text-slate-900 mt-1">7</h3>
+                    <p class="text-[11px] text-slate-400">Maquinários cadastrados</p>
+                </div>
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-emerald-600">Em Operação</span>
+                    <h3 id="statOperando" class="text-2xl font-black text-emerald-600 mt-1">6</h3>
+                    <p class="text-[11px] text-slate-400">85.7% de disponibilidade</p>
+                </div>
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-ellenco-red">Em Manutenção</span>
+                    <h3 id="statManutencao" class="text-2xl font-black text-ellenco-red mt-1">1</h3>
+                    <p class="text-[11px] text-slate-400">Manutenção preventiva</p>
+                </div>
+                <div class="card-stat">
+                    <span class="text-[11px] font-bold uppercase text-blue-600">Horímetro Total</span>
+                    <h3 id="statHorimetroTotal" class="text-2xl font-black text-blue-600 mt-1">15.651 h</h3>
+                    <p class="text-[11px] text-slate-400">Horas acumuladas em campo</p>
+                </div>
+            </div>
+
+            <!-- TABELA DE EQUIPAMENTOS -->
+            <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                    <h3 class="font-extrabold text-slate-900 text-base">Relação de Maquinário & Status</h3>
+                    <span class="badge badge-info"><i class="fa-solid fa-truck-monster"></i> Gestão de Ativos</span>
+                </div>
+
+                <div class="app-table-container">
+                    <table class="app-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Tipo de Equipamento</th>
+                                <th>Modelo / Fabricante</th>
+                                <th class="text-right">Horímetro</th>
+                                <th class="text-right">Consumo Médio</th>
+                                <th>Local Alocado</th>
+                                <th>Última Revisão</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaEquipamentos">
+                            <!-- Injetado dinamicamente via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- MODAL NOVO EQUIPAMENTO -->
+    <div id="modalNovoEquipamento" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop animate-fade-in-up">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-black text-slate-900 text-lg">Cadastrar Equipamento</h3>
+                <button onclick="fecharModalNovoEquipamento()" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="formNovoEquipamento" onsubmit="salvarNovoEquipamento(event)" class="space-y-4">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Código / Frota *</label>
+                        <input id="novoEqCodigo" required placeholder="Ex: ROL-09" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue uppercase">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Status Inicial *</label>
+                        <select id="novoEqStatus" required class="w-full border border-slate-300 rounded-xl px-2.5 py-2 text-xs outline-none">
+                            <option value="Operacional">Operacional</option>
+                            <option value="Em Manutenção">Em Manutenção</option>
+                            <option value="Em Espera">Em Espera</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Tipo de Equipamento *</label>
+                    <input id="novoEqTipo" required placeholder="Ex: Rolo Compactador de Pneus" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Modelo / Fabricante *</label>
+                    <input id="novoEqModelo" required placeholder="Ex: Dynapac CP275" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Horímetro Inicial (h) *</label>
+                        <input id="novoEqHorimetro" type="number" step="0.1" value="1200" required class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-700 mb-1">Consumo Médio *</label>
+                        <input id="novoEqConsumo" required placeholder="Ex: 16.5 L/h" value="16.5 L/h" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Local / Obra Alocada *</label>
+                    <select id="novoEqLocal" required class="w-full border border-slate-300 rounded-xl px-2.5 py-2 text-xs outline-none">
+                        <option value="SP-270 Raposo Tavares">SP-270 Raposo Tavares</option>
+                        <option value="Jardim Ellenco">Jardim Ellenco</option>
+                        <option value="Pavimentação Industrial">Pavimentação Industrial</option>
+                        <option value="Aeroporto Estadual">Aeroporto Estadual</option>
+                    </select>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="fecharModalNovoEquipamento()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-ellenco-navy hover:bg-ellenco-blue text-white font-bold rounded-xl text-xs cursor-pointer shadow-md">
+                        Salvar Equipamento
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/equipamentos.js"></script>
+</body>
+</html>

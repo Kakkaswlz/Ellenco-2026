@@ -1,0 +1,25 @@
+{
+  "name": "ellenco-apontamento-producao",
+  "version": "2.5.0",
+  "description": "Sistema Corporativo de Gestão e Apontamento Digital de Produção para Obras Pesadas",
+  "main": "server.js",
+  "scripts": {
+    "start": "node -r dotenv/config server.js",
+    "dev": "node -r dotenv/config --watch server.js"
+  },
+  "keywords": [
+    "ellenco",
+    "construcao",
+    "pavimentacao",
+    "apontamento",
+    "producao",
+    "sqlite"
+  ],
+  "author": "Ellenco Construções",
+  "license": "ISC",
+  "dependencies": {
+    "pg": "^8.13.1",
+    "dotenv": "^16.4.5",
+    "@google/genai": "^2.19.0"
+  }
+}

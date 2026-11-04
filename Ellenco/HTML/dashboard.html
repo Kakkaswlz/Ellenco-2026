@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Dashboard & KPIs de Produção</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+    <link rel="stylesheet" href="../CSS/dashboard.css">
+    <link rel="stylesheet" href="../CSS/chatbot.css">
+</head>
+
+<body class="h-full flex flex-col antialiased">
+
+    <!-- SIDEBAR CONTAINER (Injetado via JS) -->
+    <aside id="sidebar"></aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="md:ml-64 min-h-screen flex flex-col flex-1 pb-10">
+
+        <!-- TOPBAR NAVBAR (Injetado via JS) -->
+        <header id="topbar"></header>
+
+        <!-- PRINT HEADER -->
+        <div class="hidden print-header p-6 border-b border-slate-300 items-center justify-between">
+            <div class="flex items-center gap-4">
+                <img src="../IMG/logo.png" alt="Ellenco Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='logo.png';">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-900">ELLENCO CONSTRUÇÕES E PAVIMENTAÇÃO</h2>
+                    <p class="text-xs text-slate-600">Relatório Gerencial de Produção & Auditoria Operacional</p>
+                </div>
+            </div>
+            <div class="text-right text-xs text-slate-500">
+                <p>Emissão: <strong id="printDataEmissao">27/08/2026</strong></p>
+                <p>Banco de Dados Relacional SQLite</p>
+            </div>
+        </div>
+
+        <!-- CONTEÚDO PRINCIPAL DO DASHBOARD -->
+        <div class="p-4 md:p-8 space-y-6 max-w-7xl w-full mx-auto animate-fade-in-up">
+
+            <!-- BANNER DE BOAS-VINDAS & CONTEXTO -->
+            <div class="gradient-brand rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="absolute right-0 top-0 bottom-0 opacity-10 flex items-center pr-8 pointer-events-none">
+                    <i class="fa-solid fa-chart-line text-[180px]"></i>
+                </div>
+                
+                <div class="relative z-10 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-bold text-red-200 border border-white/10 mb-3">
+                        <i class="fa-solid fa-shield-check text-emerald-400"></i> Gestão Digital Sem Papel
+                    </div>
+                    <h2 class="text-2xl md:text-3xl font-black tracking-tight leading-tight">
+                        Painel Executivo de Produção
+                    </h2>
+                    <p class="text-slate-200 text-xs md:text-sm mt-2 leading-relaxed">
+                        Acompanhamento imediato das metas de pavimentação, terraplanagem e infraestrutura, com integração direta ao banco de dados SQLite.
+                    </p>
+                </div>
+
+                <div class="relative z-10 flex flex-col items-end gap-2 shrink-0">
+                    <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/15 text-right">
+                        <span class="text-[10px] uppercase font-bold text-slate-300 block">Status do Banco</span>
+                        <span id="badgeDbStatus" class="font-mono text-xs font-black text-emerald-300 flex items-center gap-1.5 justify-end">
+                            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SQLite Conectado
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRID DE METRICS / KPI CARDS (5 CARDS) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                <!-- 1. META -->
+                <div class="card-stat space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Meta Programada</span>
+                        <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-bullseye"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 id="cardMeta" class="text-2xl font-black text-slate-900">0</h3>
+                        <span class="text-xs text-slate-500 font-semibold">un</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Volume diário programado</p>
+                </div>
+
+                <!-- 2. REALIZADO -->
+                <div class="card-stat space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Produção Real</span>
+                        <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-truck-ramp-box"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 id="cardRealizado" class="text-2xl font-black text-slate-900">0</h3>
+                        <span class="text-xs text-slate-500 font-semibold">un</span>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Volume físico medido</p>
+                </div>
+
+                <!-- 3. EFICIÊNCIA -->
+                <div class="card-stat space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Eficiência Geral</span>
+                        <div class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-gauge-high"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 id="cardEficiencia" class="text-2xl font-black text-indigo-600">0%</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Atingimento de meta</p>
+                </div>
+
+                <!-- 4. DESVIO -->
+                <div class="card-stat space-y-2">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Desvio Operacional</span>
+                        <div class="w-8 h-8 rounded-lg bg-red-50 text-ellenco-red flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-arrow-trend-up"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 id="cardDesvio" class="text-2xl font-black text-emerald-600">0%</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Variação vs Planejado</p>
+                </div>
+
+                <!-- 5. PRODUTIVIDADE -->
+                <div class="card-stat space-y-2 sm:col-span-2 lg:col-span-1">
+                    <div class="flex items-center justify-between text-slate-400">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500">Produtividade</span>
+                        <div class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+                            <i class="fa-solid fa-stopwatch"></i>
+                        </div>
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                        <h3 id="cardProdutividade" class="text-2xl font-black text-slate-900">0 /h</h3>
+                    </div>
+                    <p class="text-[11px] text-slate-400">Ritmo médio por hora</p>
+                </div>
+            </div>
+
+            <!-- GRID DE GRÁFICOS (2 COLUNAS) -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- GRÁFICO 1: CURVA DE PRODUÇÃO (8 colunas) -->
+                <div class="lg:col-span-8 chart-card flex flex-col justify-between">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4 pb-3 border-b border-slate-100">
+                        <div>
+                            <h3 class="font-extrabold text-slate-900 text-base">Curva Diária de Produção</h3>
+                            <p class="text-xs text-slate-500">Comparativo entre Meta Programada vs Realizado em campo</p>
+                        </div>
+                        <span class="badge badge-info"><i class="fa-solid fa-chart-line"></i> Tempo Real</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="graficoProducao"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO 2: STATUS DAS EQUIPES (4 colunas) -->
+                <div class="lg:col-span-4 chart-card flex flex-col justify-between">
+                    <div class="mb-4 pb-3 border-b border-slate-100">
+                        <h3 class="font-extrabold text-slate-900 text-base">Desempenho das Equipes</h3>
+                        <p class="text-xs text-slate-500">Distribuição de aderência às metas</p>
+                    </div>
+                    <div class="chart-container flex items-center justify-center">
+                        <canvas id="graficoEquipes"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO 3: AVANÇO FÍSICO DAS OBRAS (6 colunas) -->
+                <div class="lg:col-span-6 chart-card">
+                    <div class="mb-4 pb-3 border-b border-slate-100">
+                        <h3 class="font-extrabold text-slate-900 text-base">Avanço Físico dos Contratos</h3>
+                        <p class="text-xs text-slate-500">Percentual de conclusão por frente de obra</p>
+                    </div>
+                    <div class="chart-container-sm">
+                        <canvas id="graficoObras"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO 4: VOLUME POR ATIVIDADE (6 colunas) -->
+                <div class="lg:col-span-6 chart-card">
+                    <div class="mb-4 pb-3 border-b border-slate-100">
+                        <h3 class="font-extrabold text-slate-900 text-base">Volume por Tipo de Serviço</h3>
+                        <p class="text-xs text-slate-500">Pavimentação CBUQ, Terraplanagem, BGS e Drenagem</p>
+                    </div>
+                    <div class="chart-container-sm">
+                        <canvas id="graficoAtividades"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEÇÃO: CLIMA & ESTIMADOR OPERACIONAL -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- WIDGET DE CLIMA EM TEMPO REAL (OPEN-METEO) -->
+                <div class="lg:col-span-5 weather-widget flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between border-b border-white/15 pb-3">
+                            <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Condições Meteorológicas</span>
+                            <span class="badge bg-white/20 text-white border-0"><i class="fa-solid fa-satellite-dish"></i> Open-Meteo API</span>
+                        </div>
+
+                        <div class="mt-4 flex items-center justify-between">
+                            <div>
+                                <h4 id="climaCidadeNome" class="text-2xl font-black">Sorocaba - SP</h4>
+                                <p id="climaCondicaoTexto" class="text-xs text-slate-300 font-semibold mt-0.5">Ensolarado / Bom Tempo</p>
+                            </div>
+                            <div class="text-right">
+                                <div class="text-4xl font-black text-amber-300 flex items-center gap-2">
+                                    <i id="climaIcone" class="fa-solid fa-sun text-3xl"></i>
+                                    <span id="climaTemperatura">26°C</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-3 border-t border-white/10 grid grid-cols-3 gap-2 text-center text-xs">
+                            <div class="bg-white/10 p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-300 block">Umidade</span>
+                                <strong id="climaUmidade" class="font-bold">58%</strong>
+                            </div>
+                            <div class="bg-white/10 p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-300 block">Vento</span>
+                                <strong id="climaVento" class="font-bold">14 km/h</strong>
+                            </div>
+                            <div class="bg-white/10 p-2 rounded-xl">
+                                <span class="text-[10px] text-slate-300 block">Prob. Chuva</span>
+                                <strong id="climaProbChuva" class="font-bold text-amber-300">10%</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 p-3 bg-white/10 rounded-xl border border-white/10 text-xs">
+                        <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-info text-amber-300"></i> Recomendação Técnica:</p>
+                        <p id="climaRecomendacao" class="text-[11px] text-slate-200 mt-1 leading-relaxed">
+                            Condições ideais para aplicação de CBUQ e compactação de massa asfáltica.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- TABELA RESUMO DAS EQUIPES -->
+                <div class="lg:col-span-7 bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 text-base">Desempenho por Equipe em Campo</h3>
+                                <p class="text-xs text-slate-500">Resumo consolidado do período filtrado</p>
+                            </div>
+                            <a href="equipes-campo.html" class="text-xs font-bold text-ellenco-navy hover:underline">Ver Todas &rarr;</a>
+                        </div>
+
+                        <div class="overflow-x-auto mt-3">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="text-slate-400 font-bold uppercase text-[10px] border-b border-slate-100">
+                                        <th class="py-2.5 px-3">Equipe</th>
+                                        <th class="py-2.5 px-3">Atividade</th>
+                                        <th class="py-2.5 px-3 text-right">Planejado</th>
+                                        <th class="py-2.5 px-3 text-right">Realizado</th>
+                                        <th class="py-2.5 px-3 text-center">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabelaEquipesDashboard" class="divide-y divide-slate-100">
+                                    <!-- Injetado dinamicamente via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-500">
+                        <span>Atualização contínua com gravação no SQLite</span>
+                        <a href="historico-auditoria.html" class="font-bold text-ellenco-navy hover:underline">Auditoria Completa &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/services/charts.js"></script>
+    <script src="../js/components/sidebar.js"></script>
+    <script src="../js/components/topbar.js"></script>
+    <script src="../js/components/chatbot.js"></script>
+    <script src="../js/pages/dashboard.js"></script>
+</body>
+</html>

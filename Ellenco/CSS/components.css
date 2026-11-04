@@ -1,0 +1,169 @@
+/* ==================================================================== */
+/* ELLENCO - COMPONENTS.CSS                                             */
+/* Cards de Métricas, Badges, Tabelas, Modais, Botões e Toasts         */
+/* ==================================================================== */
+
+/* Cards de Estatísticas e KPIs */
+.card-stat {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 1rem;
+    padding: 1.25rem;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s;
+}
+
+.card-stat:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px -5px rgba(10, 35, 66, 0.08), 0 4px 6px -2px rgba(10, 35, 66, 0.04);
+    border-color: #CBD5E1;
+}
+
+/* Badges e Tags de Status */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.badge-success {
+    background-color: #ECFDF5;
+    color: #065F46;
+    border: 1px solid #A7F3D0;
+}
+
+.badge-warning {
+    background-color: #FFFBEB;
+    color: #92400E;
+    border: 1px solid #FDE68A;
+}
+
+.badge-danger {
+    background-color: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+}
+
+.badge-info {
+    background-color: #EFF6FF;
+    color: #1E40AF;
+    border: 1px solid #BFDBFE;
+}
+
+.badge-pulse {
+    animation: pulseRing 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(229, 25, 32, 0.7);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(229, 25, 32, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(229, 25, 32, 0);
+    }
+}
+
+/* Tabelas Corporativas */
+.app-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 1rem;
+}
+
+.app-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8125rem;
+    text-align: left;
+}
+
+.app-table th {
+    background-color: #F8FAFC;
+    color: #475569;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    letter-spacing: 0.05em;
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #E2E8F0;
+}
+
+.app-table td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid #F1F5F9;
+    color: #1E293B;
+}
+
+.app-table tbody tr {
+    transition: background-color 0.15s ease;
+}
+
+.app-table tbody tr:hover {
+    background-color: #F8FAFC;
+}
+
+.app-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Botões Customizados */
+.btn-primary {
+    background-color: var(--ellenco-navy);
+    color: #FFFFFF;
+    font-weight: 700;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(10, 35, 66, 0.15);
+}
+
+.btn-primary:hover {
+    background-color: var(--ellenco-blue);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -2px rgba(10, 35, 66, 0.2);
+}
+
+.btn-secondary {
+    background-color: #F1F5F9;
+    color: #334155;
+    font-weight: 600;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.75rem;
+    transition: all 0.18s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border: 1px solid #CBD5E1;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background-color: #E2E8F0;
+    color: #0F172A;
+}
+
+/* Modais com Backdrop Blur */
+.modal-backdrop {
+    background-color: rgba(10, 35, 66, 0.6);
+    backdrop-filter: blur(4px);
+}

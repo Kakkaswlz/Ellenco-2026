@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ellenco | Sistema Digital de Apontamento de Produção</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ellenco: {
+                            navy: '#0A2342',
+                            blue: '#123F70',
+                            darkblue: '#071930',
+                            red: '#E51920',
+                            redhover: '#C41218',
+                            light: '#F8FAFC',
+                            slate: '#1E293B'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Plus Jakarta Sans', 'Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <!-- CSS Modularizado -->
+    <link rel="stylesheet" href="../CSS/base.css">
+    <link rel="stylesheet" href="../CSS/layout.css">
+    <link rel="stylesheet" href="../CSS/components.css">
+</head>
+
+<body class="h-full flex items-center justify-center p-4 bg-slate-100/80">
+
+    <!-- CONTAINER PRINCIPAL DO LOGIN -->
+    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 grid grid-cols-1 md:grid-cols-12 min-h-[600px] animate-fade-in-up">
+        
+        <!-- PAINEL ESQUERDO: BRANDING & ATALHOS RÁPIDOS (5 colunas) -->
+        <div class="md:col-span-5 gradient-brand p-8 text-white flex flex-col justify-between relative overflow-hidden">
+            <div class="absolute -right-8 -bottom-8 opacity-10 pointer-events-none">
+                <i class="fa-solid fa-hard-hat text-[220px]"></i>
+            </div>
+            
+            <div class="relative z-10">
+                <!-- LOGO DA ELLENCO -->
+                <div class="bg-white rounded-2xl p-4 w-44 shadow-lg mb-6 flex items-center justify-center">
+                    <img src="../IMG/logo.png" alt="Ellenco" class="h-8 w-auto object-contain" onerror="this.onerror=null; this.src='logo.png';">
+                </div>
+
+                <span class="inline-block px-3 py-1 rounded-full bg-white/10 text-red-300 text-[11px] font-bold border border-white/10 mb-3 uppercase tracking-wider">
+                    Plataforma Oficial de Obras
+                </span>
+                <h2 class="text-2xl font-black tracking-tight leading-tight">
+                    Gestão Digital & Apontamento de Produção
+                </h2>
+                <p class="text-slate-300 text-xs mt-3 leading-relaxed">
+                    Controle em tempo real de pavimentação, terraplanagem, frotas e conferência automática de metas com banco de dados SQLite.
+                </p>
+            </div>
+
+            <!-- ACESSO RÁPIDO DE DEMONSTRAÇÃO -->
+            <div class="mt-8 pt-5 border-t border-white/15 space-y-2.5 relative z-10">
+                <div class="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-slate-300">
+                    <span>Acesso Rápido para Teste:</span>
+                </div>
+                <div class="grid grid-cols-1 gap-2">
+                    <button type="button" onclick="loginRapido('operacional')" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10 flex items-center justify-between text-xs font-semibold cursor-pointer">
+                        <span class="flex items-center gap-2 truncate">
+                            <i class="fa-solid fa-hard-hat text-amber-400"></i> Carlos Silva (Encarregado)
+                        </span>
+                        <span class="text-[10px] bg-amber-400/20 text-amber-300 px-2 py-0.5 rounded font-mono shrink-0">Operacional</span>
+                    </button>
+                    <button type="button" onclick="loginRapido('gestor')" class="w-full text-left p-2.5 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/10 flex items-center justify-between text-xs font-semibold cursor-pointer">
+                        <span class="flex items-center gap-2 truncate">
+                            <i class="fa-solid fa-user-tie text-blue-300"></i> Eng. Ricardo Viana (Diretoria)
+                        </span>
+                        <span class="text-[10px] bg-blue-400/20 text-blue-300 px-2 py-0.5 rounded font-mono shrink-0">Superior</span>
+                    </button>
+                </div>
+                <div class="flex items-center justify-between text-[11px] text-slate-300 pt-1">
+                    <span><i class="fa-solid fa-database text-emerald-400 mr-1"></i> SQLite Relacional</span>
+                    <span class="font-mono">v2.5</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- PAINEL DIREITO: FORMULÁRIOS DINÂMICOS (7 colunas) -->
+        <div class="md:col-span-7 p-6 md:p-8 flex flex-col justify-between bg-white text-slate-900 overflow-y-auto">
+            <div>
+                <!-- ABAS DE NAVEGAÇÃO SUPERIOR -->
+                <div class="grid grid-cols-3 gap-1 p-1 bg-slate-100 rounded-xl mb-6 border border-slate-200">
+                    <button type="button" id="tabBtnLogin" onclick="alternarAbaAuth('login')" class="py-2 rounded-lg text-xs font-bold transition-all bg-white text-ellenco-navy shadow-xs cursor-pointer">
+                        <i class="fa-solid fa-lock mr-1.5"></i> Entrar
+                    </button>
+                    <button type="button" id="tabBtnCadastro" onclick="alternarAbaAuth('cadastro')" class="py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition-all cursor-pointer">
+                        <i class="fa-solid fa-user-plus mr-1.5"></i> Cadastrar
+                    </button>
+                    <button type="button" id="tabBtnStatus" onclick="alternarAbaAuth('status')" class="py-2 rounded-lg text-xs font-bold text-slate-500 hover:text-slate-900 transition-all cursor-pointer">
+                        <i class="fa-solid fa-magnifying-glass mr-1.5"></i> Status
+                    </button>
+                </div>
+
+                <!-- 1. ABA: LOGIN -->
+                <div id="boxFormLogin" class="space-y-4 animate-fade-in-up">
+                    <div>
+                        <h3 class="text-xl font-black text-slate-900 tracking-tight">Autenticação do Sistema</h3>
+                        <p class="text-xs text-slate-500 mt-0.5">Insira seu RE, E-mail ou CPF cadastrado</p>
+                    </div>
+
+                    <form id="formLogin" onsubmit="efetuarLogin(event)" class="space-y-3.5 mt-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">RE, CPF ou E-mail *</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-id-card absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input id="loginRE" type="text" required placeholder="Ex: RE-8842 ou carlos.silva@ellenco.com.br" class="w-full border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Senha de Acesso *</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-key absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input id="loginSenha" type="password" required placeholder="••••••••" value="123" class="w-full border border-slate-300 rounded-xl pl-9 pr-9 py-2.5 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                                <button type="button" onclick="toggleSenhaVisibilidade('loginSenha', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 text-xs cursor-pointer">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Perfil de Acesso *</label>
+                                <select id="loginPerfil" required class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs outline-none font-bold">
+                                    <option value="operacional">👷 Campo / Apontamento</option>
+                                    <option value="gestor" selected>👔 Engenharia / Diretoria</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-700 mb-1">Obra Alocada</label>
+                                <input id="loginCodigoObra" type="text" placeholder="Ex: SP-270" value="SP-270 Rodovia Raposo Tavares" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 text-xs outline-none font-medium">
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs pt-1">
+                            <label class="flex items-center gap-1.5 text-slate-600 cursor-pointer">
+                                <input type="checkbox" checked class="w-3.5 h-3.5 rounded text-ellenco-red">
+                                <span>Lembrar meu acesso</span>
+                            </label>
+                            <a href="javascript:void(0)" onclick="mostrarToast('Para redefinição de senha, contate a TI: ti@ellenco.com.br', 'info')" class="text-ellenco-navy font-bold hover:underline">Esqueceu a senha?</a>
+                        </div>
+
+                        <button type="submit" class="w-full py-3 rounded-xl bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-bold transition-all shadow-lg shadow-ellenco-navy/20 flex items-center justify-center gap-2 cursor-pointer mt-2">
+                            <i class="fa-solid fa-right-to-bracket text-ellenco-red"></i> Entrar no Sistema
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 2. ABA: CADASTRO -->
+                <div id="boxFormCadastro" class="hidden space-y-3.5 animate-fade-in-up">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 tracking-tight">Cadastro de Novo Colaborador</h3>
+                        <p class="text-[11px] text-slate-500">Seus dados serão gravados no banco de dados e avaliados pela Diretoria.</p>
+                    </div>
+
+                    <form id="formCadastro" onsubmit="efetuarCadastro(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Nome Completo *</label>
+                            <input id="cadNome" type="text" required placeholder="Ex: Marcos Andrade" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">RE ou CPF *</label>
+                                <input id="cadRE" type="text" required placeholder="Ex: RE-6620" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">E-mail *</label>
+                                <input id="cadEmail" type="email" required placeholder="marcos@ellenco.com.br" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Telefone / WhatsApp *</label>
+                                <input id="cadTelefone" type="text" required placeholder="(15) 99888-7766" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Obra de Lotação *</label>
+                                <select id="cadObra" required class="w-full border border-slate-300 rounded-xl px-2 py-2 text-xs outline-none">
+                                    <option value="SP-270 Rodovia Raposo Tavares">SP-270 Raposo Tavares</option>
+                                    <option value="Loteamento Jardim Ellenco">Jardim Ellenco</option>
+                                    <option value="Pavimentação Industrial">Pavimentação Industrial</option>
+                                    <option value="Aeroporto Estadual">Aeroporto Estadual</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Cargo Pretendido *</label>
+                            <select id="cadCargo" required class="w-full border border-slate-300 rounded-xl px-2.5 py-2 text-xs outline-none font-bold text-slate-800">
+                                <option value="apontador">👷 Apontador de Campo (Nível 1 - Operacional)</option>
+                                <option value="encarregado">👷 Encarregado de Equipe (Nível 1 - Operacional)</option>
+                                <option value="supervisor">🚜 Supervisor de Campo (Nível 2 - Técnico)</option>
+                                <option value="engenheiro">🏗️ Engenheiro de Produção (Nível 3 - Engenharia)</option>
+                                <option value="gestor">👔 Diretor / Gestor de Obras (Nível 4 - Gestão)</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Criar Senha *</label>
+                                <input id="cadSenha" type="password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold text-slate-700 mb-0.5">Confirmar Senha *</label>
+                                <input id="cadSenhaConfirma" type="password" required placeholder="••••••••" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full py-2.5 rounded-xl bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-1">
+                            <i class="fa-solid fa-paper-plane text-ellenco-red"></i> Enviar Solicitação de Cadastro
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 3. ABA: STATUS DA SOLICITAÇÃO -->
+                <div id="boxFormStatus" class="hidden space-y-4 animate-fade-in-up">
+                    <div>
+                        <h3 class="text-lg font-black text-slate-900 tracking-tight">Consulta de Acesso</h3>
+                        <p class="text-xs text-slate-500">Consulte o andamento da sua aprovação no banco de dados.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Informe seu RE, CPF ou E-mail *</label>
+                            <div class="relative">
+                                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-xs"></i>
+                                <input id="consultaStatusRE" type="text" placeholder="Ex: RE-8842 ou carlos.silva@ellenco.com.br" class="w-full border border-slate-300 rounded-xl pl-9 pr-3 py-2.5 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                            </div>
+                        </div>
+
+                        <button type="button" onclick="consultarStatusSolicitacao()" class="w-full py-2.5 rounded-xl bg-ellenco-navy hover:bg-ellenco-blue text-white text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-search"></i> Pesquisar no Banco de Dados
+                        </button>
+                    </div>
+
+                    <!-- CARD DE RESULTADO -->
+                    <div id="resultadoConsultaStatus" class="hidden animate-fade-in-up pt-2"></div>
+                </div>
+            </div>
+
+            <!-- RODAPÉ CORPORATIVO -->
+            <div class="pt-4 text-center border-t border-slate-100 text-[11px] text-slate-400 mt-6">
+                Ellenco Construções e Pavimentação • Sistema Digital de Produção 2026
+            </div>
+        </div>
+
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- SCRIPTS MODULARIZADOS -->
+    <script src="../js/services/auth.js"></script>
+    <script src="../js/services/api.js"></script>
+    <script src="../js/pages/login.js"></script>
+</body>
+</html>
