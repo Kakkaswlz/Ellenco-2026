@@ -21,17 +21,30 @@ let sqliteDb = null;
 
 if (USE_POSTGRES) {
     const { Pool } = require('pg');
+    
+    // Remove sslmode da query string para evitar que o pg sobrescreva o objeto ssl
+    let cleanUrl = DATABASE_URL;
+    try {
+        const parsed = new URL(DATABASE_URL);
+        parsed.searchParams.delete('sslmode');
+        cleanUrl = parsed.toString();
+    } catch (e) {
+        cleanUrl = DATABASE_URL.replace(/[?&]sslmode=[^&]+/g, '');
+    }
+
     pool = new Pool({
-        connectionString: DATABASE_URL,
-        ssl: { rejectUnauthorized: false },
+        connectionString: cleanUrl,
+        ssl: {
+            rejectUnauthorized: false
+        },
         max: 10,
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 5000
+        connectionTimeoutMillis: 8000
     });
     pool.on('error', (err) => {
         console.error('Erro inesperado no pool PostgreSQL:', err);
     });
-    console.log('🐘 Conectado ao PostgreSQL (Supabase)');
+    console.log('🐘 Conectado ao PostgreSQL (Supabase Pooler)');
 } else {
     try {
         const { DatabaseSync } = require('node:sqlite');
