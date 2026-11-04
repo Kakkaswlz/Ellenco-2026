@@ -291,7 +291,7 @@ const server = http.createServer(async (req, res) => {
                 const buscaSemantica = await db.apontamentos.buscarSemantico(mensagem);
 
                 // 2. Tenta processar via Google GenAI (Gemini) se disponível
-                if (genAI && process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEY.startsWith('AQ.')) {
+                if (genAI && process.env.GEMINI_API_KEY) {
                     try {
                         const promptSistema = `
 Você é o Assistente Inteligente Oficial da plataforma Ellenco Construções e Pavimentação.
