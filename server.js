@@ -25,7 +25,7 @@ try {
 // Inicializa cliente Gemini SDK
 let genAI = null;
 try {
-    const { GoogleGenAI } = require(path.join(__dirname, 'Assistente-Ellenco', 'node_modules', '@google/genai'));
+    const { GoogleGenAI } = require('@google/genai');
     if (process.env.GEMINI_API_KEY) {
         genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     }
@@ -331,7 +331,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
 
                 // 3. Motor Analítico Local Nativo (100% Determinístico, baseado nos dados reais do SQLite)
-                const resultadoLocal = processarConsultaAnaliticaLocal(mensagem, contextoCompleto, historico);
+                const resultadoLocal = await processarConsultaAnaliticaLocal(mensagem, contextoCompleto, historico);
                 return sendJSON(res, {
                     resposta: resultadoLocal.resposta,
                     fonte: 'Motor Analítico Ellenco (SQLite)',
