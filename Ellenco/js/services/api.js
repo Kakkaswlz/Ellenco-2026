@@ -415,6 +415,33 @@ const api = {
     },
 
     // ==========================================
+    // ATIVIDADES (catálogo)
+    // ==========================================
+    async getAtividades() {
+        if (await testarServidor()) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/atividades`);
+                if (res.ok) return await res.json();
+            } catch (e) {}
+        }
+        return null; // servidor indisponível
+    },
+
+    async postAtividade(dados) {
+        if (await testarServidor()) {
+            try {
+                const res = await fetch(`${API_BASE_URL}/atividades`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(dados)
+                });
+                if (res.ok) return await res.json();
+            } catch (e) {}
+        }
+        return null; // servidor indisponível
+    },
+
+    // ==========================================
     // EQUIPAMENTOS
     // ==========================================
     async getEquipamentos() {

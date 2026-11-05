@@ -112,3 +112,19 @@ CREATE INDEX IF NOT EXISTS idx_apontamentos_data ON apontamentos(data);
 CREATE INDEX IF NOT EXISTS idx_apontamentos_obra ON apontamentos(obra);
 CREATE INDEX IF NOT EXISTS idx_apontamentos_equipe ON apontamentos(equipe);
 CREATE INDEX IF NOT EXISTS idx_usuarios_re ON usuarios(re);
+
+-- 8. TABELA DE ATIVIDADES (catálogo de serviços + unidade técnica)
+CREATE TABLE IF NOT EXISTS atividades (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    unidade TEXT NOT NULL,
+    criado_em DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS atividades_nome_unico ON atividades (lower(nome));
+INSERT OR IGNORE INTO atividades (nome, unidade) VALUES
+    ('Pavimentação CBUQ - Capa Asfáltica', 'ton'),
+    ('Terraplanagem - Corte e Aterro', 'm³'),
+    ('Aplicação de Brita Graduada (BGS)', 'm³'),
+    ('Assentamento de Tubos e Galerias', 'm'),
+    ('Fresagem de Pavimento Asfáltico', 'm²'),
+    ('Pintura Termoplástica e Tachas', 'm²');

@@ -43,11 +43,33 @@ function adicionarOpcaoAtividade(nome, unidade) {
     return opt;
 }
 
-function carregarAtividadesPersonalizadas() {
+async function carregarAtividadesPersonalizadas() {
+    // 1) Atividades guardadas neste navegador (usadas quando o servidor está offline)
     atividadesPersonalizadas = lerAtividadesSalvas();
     Object.entries(atividadesPersonalizadas).forEach(([nome, unidade]) => {
-        adicionarOpcaoAtividade(nome, String(unidade));
+        adicionarOpcaoSeNaoExiste(nome, String(unidade));
     });
+
+    // 2) Atividades do banco de dados (catálogo compartilhado)
+    try {
+        const lista = await api.getAtividades();
+        if (Array.isArray(lista)) {
+            lista.forEach(a => {
+                atividadesPersonalizadas[a.nome] = a.unidade;
+                adicionarOpcaoSeNaoExiste(a.nome, a.unidade);
+            });
+            alterarUnidade();
+        }
+    } catch (e) { /* mantém apenas as atividades locais */ }
+}
+
+function adicionarOpcaoSeNaoExiste(nome, unidade) {
+    const select = document.getElementById("atividade");
+    if (!select) return null;
+    const existente = Array.from(select.options).find(
+        o => o.value.toLowerCase() === nome.toLowerCase()
+    );
+    return existente || adicionarOpcaoAtividade(nome, unidade);
 }
 
 function abrirModalNovaAtividade() {
@@ -68,7 +90,7 @@ function fecharModalNovaAtividade() {
     document.getElementById("formNovaAtividade")?.reset();
 }
 
-function salvarNovaAtividade(e) {
+async function salvarNovaAtividade(e) {
     e.preventDefault();
     const nome = document.getElementById("novaAtividadeNome").value.trim();
     const unidade = document.getElementById("novaAtividadeUnidade").value.trim();
@@ -87,13 +109,25 @@ function salvarNovaAtividade(e) {
         return;
     }
 
+    let salvaNoBanco = false;
+    try {
+        const criada = await api.postAtividade({ nome, unidade });
+        salvaNoBanco = !!(criada && criada.id);
+    } catch (err) { /* cai no armazenamento local */ }
+
     atividadesPersonalizadas[nome] = unidade;
-    gravarAtividadesSalvas();
+    if (!salvaNoBanco) gravarAtividadesSalvas(); // reserva: só neste navegador
+
     const opt = adicionarOpcaoAtividade(nome, unidade);
     if (opt) select.value = nome;
     alterarUnidade();
 
-    mostrarToast("Atividade cadastrada com sucesso!", "sucesso");
+    mostrarToast(
+        salvaNoBanco
+            ? "Atividade cadastrada com sucesso!"
+            : "Atividade salva só neste navegador (servidor indisponível).",
+        salvaNoBanco ? "sucesso" : "info"
+    );
     fecharModalNovaAtividade();
 }
 

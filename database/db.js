@@ -351,6 +351,16 @@ module.exports = {
                 ]
             );
 
+            // Vincula o apontamento ao catálogo de atividades (apenas PostgreSQL)
+            if (USE_POSTGRES && result.insertedId) {
+                try {
+                    const ativ = await module.exports.atividades.criar({ nome: dados.atividade, unidade: dados.unidade });
+                    await queryRun('UPDATE apontamentos SET atividade_id = $1 WHERE id = $2', [ativ.id, result.insertedId]);
+                } catch (e) {
+                    console.warn('Aviso: não foi possível vincular a atividade:', e.message);
+                }
+            }
+
             // Atualiza acumulados da equipe
             try {
                 await queryRun(
@@ -494,6 +504,27 @@ module.exports = {
         },
         async remover(id) {
             return await queryRun('DELETE FROM equipes WHERE id = $1', [id]);
+        }
+    },
+
+    // ==========================================
+    // ATIVIDADES (catálogo de serviços + unidade técnica)
+    // ==========================================
+    atividades: {
+        async listar() {
+            return await queryAll('SELECT id, nome, unidade FROM atividades ORDER BY id ASC');
+        },
+        async criar(dados) {
+            const nome = String(dados.nome || '').trim();
+            const unidade = String(dados.unidade || '').trim();
+            if (!nome || !unidade) throw new Error('Nome e unidade são obrigatórios.');
+            const existente = await queryOne('SELECT id, nome, unidade FROM atividades WHERE lower(nome) = lower($1)', [nome]);
+            if (existente) return { ...existente, jaExistia: true };
+            const result = await queryRun(
+                'INSERT INTO atividades (nome, unidade) VALUES ($1, $2) RETURNING id',
+                [nome, unidade]
+            );
+            return { id: result.insertedId, nome, unidade };
         }
     },
 

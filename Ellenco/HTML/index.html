@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="h-full bg-slate-50">
+<html lang="pt-BR" class="bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,11 +44,20 @@
     <link rel="stylesheet" href="../CSS/layout.css">
     <link rel="stylesheet" href="../CSS/components.css">
 
+    <!-- Ajuste mobile (iPhone/Safari): permite rolar a página inteira e evita zoom automático nos campos -->
+    <style>
+        html, body { height: auto !important; min-height: 100%; }
+        body { min-height: 100vh; min-height: 100dvh; -webkit-text-size-adjust: 100%; }
+        @media (max-width: 767px) {
+            input, select, textarea { font-size: 16px !important; }
+        }
+    </style>
+
     <!-- Fav Icon -->
     <link rel="icon" type="image/png" href="/favicon.png">
 </head>
 
-<body class="h-full flex items-center justify-center p-4 bg-slate-100/80">
+<body class="min-h-full flex items-start md:items-center justify-center p-3 sm:p-4 bg-slate-100/80">
 
     <!-- CONTAINER PRINCIPAL DO LOGIN -->
     <div class="max-w-4xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200 grid grid-cols-1 md:grid-cols-12 min-h-[600px] animate-fade-in-up">
@@ -72,7 +81,7 @@
                     Gestão Digital & Apontamento de Produção
                 </h2>
                 <p class="text-slate-300 text-xs mt-3 leading-relaxed">
-                    Controle em tempo real de pavimentação, terraplanagem, frotas e conferência automática de metas com banco de dados SQLite.
+                    Controle em tempo real de pavimentação, terraplanagem, frotas e conferência automática de metas com banco de dados PostgreSQL.
                 </p>
             </div>
 
@@ -96,7 +105,7 @@
                     </button>
                 </div>
                 <div class="flex items-center justify-between text-[11px] text-slate-300 pt-1">
-                    <span><i class="fa-solid fa-database text-emerald-400 mr-1"></i> SQLite Relacional</span>
+                    <span><i class="fa-solid fa-database text-emerald-400 mr-1"></i> PostgreSQL Relacional</span>
                     <span class="font-mono">v2.5</span>
                 </div>
             </div>

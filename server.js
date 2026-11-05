@@ -389,6 +389,23 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
             }
 
+            // 3b. ATIVIDADES (catálogo)
+            if (pathname === '/api/atividades') {
+                if (method === 'GET') {
+                    return sendJSON(res, await db.atividades.listar());
+                }
+                if (method === 'POST') {
+                    const body = await parseBody(req);
+                    const nome = String(body.nome || '').trim().slice(0, 80);
+                    const unidade = String(body.unidade || '').trim().slice(0, 10);
+                    if (!nome || !unidade) {
+                        return sendJSON(res, { error: 'Nome e unidade são obrigatórios.' }, 400);
+                    }
+                    const nova = await db.atividades.criar({ nome, unidade });
+                    return sendJSON(res, nova, nova.jaExistia ? 200 : 201);
+                }
+            }
+
             // 4. OBRAS & FRENTES
             if (pathname === '/api/obras') {
                 if (method === 'GET') {
