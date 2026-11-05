@@ -3,6 +3,100 @@
 /* Controlador do Formulário de Registro de Produção de Campo (BDP)     */
 /* ==================================================================== */
 
+/* ==================================================================== */
+/* ATIVIDADES: padrão + personalizadas (salvas neste navegador)         */
+/* ==================================================================== */
+const UNIDADES_PADRAO = {
+    "Pavimentação CBUQ - Capa Asfáltica": "ton",
+    "Terraplanagem - Corte e Aterro": "m³",
+    "Aplicação de Brita Graduada (BGS)": "m³",
+    "Assentamento de Tubos e Galerias": "m",
+    "Fresagem de Pavimento Asfáltico": "m²",
+    "Pintura Termoplástica e Tachas": "m²"
+};
+const CHAVE_ATIVIDADES = "ellenco_atividades_personalizadas";
+let atividadesPersonalizadas = {};
+
+function lerAtividadesSalvas() {
+    try {
+        const bruto = localStorage.getItem(CHAVE_ATIVIDADES);
+        const obj = bruto ? JSON.parse(bruto) : {};
+        return obj && typeof obj === "object" && !Array.isArray(obj) ? obj : {};
+    } catch (e) {
+        return {};
+    }
+}
+
+function gravarAtividadesSalvas() {
+    try {
+        localStorage.setItem(CHAVE_ATIVIDADES, JSON.stringify(atividadesPersonalizadas));
+    } catch (e) { /* sem armazenamento: a atividade vale só até recarregar */ }
+}
+
+function adicionarOpcaoAtividade(nome, unidade) {
+    const select = document.getElementById("atividade");
+    if (!select) return null;
+    const opt = document.createElement("option");
+    opt.value = nome;
+    opt.textContent = `${nome} (${unidade})`;
+    select.appendChild(opt);
+    return opt;
+}
+
+function carregarAtividadesPersonalizadas() {
+    atividadesPersonalizadas = lerAtividadesSalvas();
+    Object.entries(atividadesPersonalizadas).forEach(([nome, unidade]) => {
+        adicionarOpcaoAtividade(nome, String(unidade));
+    });
+}
+
+function abrirModalNovaAtividade() {
+    const modal = document.getElementById("modalNovaAtividade");
+    if (modal) {
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        document.getElementById("novaAtividadeNome")?.focus();
+    }
+}
+
+function fecharModalNovaAtividade() {
+    const modal = document.getElementById("modalNovaAtividade");
+    if (modal) {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }
+    document.getElementById("formNovaAtividade")?.reset();
+}
+
+function salvarNovaAtividade(e) {
+    e.preventDefault();
+    const nome = document.getElementById("novaAtividadeNome").value.trim();
+    const unidade = document.getElementById("novaAtividadeUnidade").value.trim();
+
+    if (!nome || !unidade) {
+        mostrarToast("Informe o nome da atividade e a unidade técnica.", "erro");
+        return;
+    }
+
+    const select = document.getElementById("atividade");
+    const jaExiste = Array.from(select.options).some(
+        o => o.value.toLowerCase() === nome.toLowerCase()
+    );
+    if (jaExiste) {
+        mostrarToast("Essa atividade já existe na lista.", "erro");
+        return;
+    }
+
+    atividadesPersonalizadas[nome] = unidade;
+    gravarAtividadesSalvas();
+    const opt = adicionarOpcaoAtividade(nome, unidade);
+    if (opt) select.value = nome;
+    alterarUnidade();
+
+    mostrarToast("Atividade cadastrada com sucesso!", "sucesso");
+    fecharModalNovaAtividade();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     renderSidebar("apontamento");
     renderTopbar("Novo Apontamento", "Registro diário com validação imediata e gravação no banco", false);
@@ -15,6 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
         inputData.value = new Date().toISOString().split("T")[0];
     }
 
+    carregarAtividadesPersonalizadas();
     gerarNovoProtocolo();
     alterarUnidade();
     calcularDesvio();
@@ -26,16 +121,7 @@ function alterarUnidade() {
     const label1 = document.getElementById("labelMetaPlanejada");
     const label2 = document.getElementById("labelProducaoRealizada");
 
-    const mapa = {
-        "Pavimentação CBUQ - Capa Asfáltica": "ton",
-        "Terraplanagem - Corte e Aterro": "m³",
-        "Aplicação de Brita Graduada (BGS)": "m³",
-        "Assentamento de Tubos e Galerias": "m",
-        "Fresagem de Pavimento Asfáltico": "m²",
-        "Pintura Termoplástica e Tachas": "m²"
-    };
-
-    const u = mapa[ativ] || "un";
+    const u = { ...UNIDADES_PADRAO, ...atividadesPersonalizadas }[ativ] || "un";
     if (unidadeInput) unidadeInput.value = u;
     if (label1) label1.textContent = `Meta Programada (${u}) *`;
     if (label2) label2.textContent = `Volume Realizado em Campo (${u}) *`;
@@ -248,6 +334,9 @@ function limparFormulario() {
 }
 
 window.alterarUnidade = alterarUnidade;
+window.abrirModalNovaAtividade = abrirModalNovaAtividade;
+window.fecharModalNovaAtividade = fecharModalNovaAtividade;
+window.salvarNovaAtividade = salvarNovaAtividade;
 window.aoMudarEquipe = aoMudarEquipe;
 window.aoMudarObra = aoMudarObra;
 window.calcularDesvio = calcularDesvio;
