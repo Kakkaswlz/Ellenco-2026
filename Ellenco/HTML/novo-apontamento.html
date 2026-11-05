@@ -146,7 +146,12 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                 <div class="sm:col-span-2">
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipo de Serviço / Atividade *</label>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label class="block text-xs font-bold text-slate-700">Tipo de Serviço / Atividade *</label>
+                                        <button type="button" onclick="abrirModalNovaAtividade()" class="bg-ellenco-navy hover:bg-ellenco-blue text-white text-[11px] font-bold px-3 py-1.5 rounded-lg shadow-sm flex items-center gap-1.5 cursor-pointer transition-all">
+                                            <i class="fa-solid fa-plus text-ellenco-red"></i> Nova Atividade
+                                        </button>
+                                    </div>
                                     <select id="atividade" required onchange="alterarUnidade()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800">
                                         <option value="Pavimentação CBUQ - Capa Asfáltica">Pavimentação CBUQ - Capa Asfáltica (ton)</option>
                                         <option value="Terraplanagem - Corte e Aterro">Terraplanagem - Corte e Aterro (m³)</option>
@@ -304,6 +309,46 @@
     <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- SCRIPTS MODULARIZADOS -->
+
+    <!-- MODAL NOVA ATIVIDADE -->
+    <div id="modalNovaAtividade" class="fixed inset-0 z-50 hidden items-center justify-center p-4 modal-backdrop animate-fade-in-up">
+        <div class="bg-white rounded-3xl max-w-md w-full shadow-2xl p-6 md:p-8 space-y-5 border border-slate-100">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-black text-slate-900 text-lg">Cadastrar Nova Atividade</h3>
+                <button type="button" onclick="fecharModalNovaAtividade()" class="text-slate-400 hover:text-slate-600 cursor-pointer text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="formNovaAtividade" onsubmit="salvarNovaAtividade(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Atividade *</label>
+                    <input id="novaAtividadeNome" required maxlength="80" placeholder="Ex: Compactação de Subleito" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">Unidade Técnica *</label>
+                    <input id="novaAtividadeUnidade" required maxlength="10" list="listaUnidades" placeholder="Ex: ton, m³, m², m, un" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                    <datalist id="listaUnidades">
+                        <option value="ton"></option>
+                        <option value="m³"></option>
+                        <option value="m²"></option>
+                        <option value="m"></option>
+                        <option value="km"></option>
+                        <option value="un"></option>
+                        <option value="kg"></option>
+                        <option value="h"></option>
+                    </datalist>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="fecharModalNovaAtividade()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="px-5 py-2 bg-ellenco-navy hover:bg-ellenco-blue text-white font-bold rounded-xl text-xs cursor-pointer shadow-md">
+                        Salvar Atividade
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script src="../js/services/auth.js"></script>
     <script src="../js/services/api.js"></script>
     <script src="../js/components/sidebar.js"></script>
