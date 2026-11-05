@@ -38,6 +38,12 @@ function renderSidebar(activePage = "dashboard") {
             label: "Histórico & Auditoria"
         },
         {
+            id: "atividades",
+            url: "atividades.html",
+            icon: "fa-solid fa-list-check",
+            label: "Atividades"
+        },
+        {
             id: "equipes",
             url: "equipes-campo.html",
             icon: "fa-solid fa-users-gear",

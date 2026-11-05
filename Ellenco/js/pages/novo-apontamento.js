@@ -27,12 +27,6 @@ function lerAtividadesSalvas() {
     }
 }
 
-function gravarAtividadesSalvas() {
-    try {
-        localStorage.setItem(CHAVE_ATIVIDADES, JSON.stringify(atividadesPersonalizadas));
-    } catch (e) { /* sem armazenamento: a atividade vale só até recarregar */ }
-}
-
 function adicionarOpcaoAtividade(nome, unidade) {
     const select = document.getElementById("atividade");
     if (!select) return null;
@@ -70,65 +64,6 @@ function adicionarOpcaoSeNaoExiste(nome, unidade) {
         o => o.value.toLowerCase() === nome.toLowerCase()
     );
     return existente || adicionarOpcaoAtividade(nome, unidade);
-}
-
-function abrirModalNovaAtividade() {
-    const modal = document.getElementById("modalNovaAtividade");
-    if (modal) {
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        document.getElementById("novaAtividadeNome")?.focus();
-    }
-}
-
-function fecharModalNovaAtividade() {
-    const modal = document.getElementById("modalNovaAtividade");
-    if (modal) {
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-    }
-    document.getElementById("formNovaAtividade")?.reset();
-}
-
-async function salvarNovaAtividade(e) {
-    e.preventDefault();
-    const nome = document.getElementById("novaAtividadeNome").value.trim();
-    const unidade = document.getElementById("novaAtividadeUnidade").value.trim();
-
-    if (!nome || !unidade) {
-        mostrarToast("Informe o nome da atividade e a unidade técnica.", "erro");
-        return;
-    }
-
-    const select = document.getElementById("atividade");
-    const jaExiste = Array.from(select.options).some(
-        o => o.value.toLowerCase() === nome.toLowerCase()
-    );
-    if (jaExiste) {
-        mostrarToast("Essa atividade já existe na lista.", "erro");
-        return;
-    }
-
-    let salvaNoBanco = false;
-    try {
-        const criada = await api.postAtividade({ nome, unidade });
-        salvaNoBanco = !!(criada && criada.id);
-    } catch (err) { /* cai no armazenamento local */ }
-
-    atividadesPersonalizadas[nome] = unidade;
-    if (!salvaNoBanco) gravarAtividadesSalvas(); // reserva: só neste navegador
-
-    const opt = adicionarOpcaoAtividade(nome, unidade);
-    if (opt) select.value = nome;
-    alterarUnidade();
-
-    mostrarToast(
-        salvaNoBanco
-            ? "Atividade cadastrada com sucesso!"
-            : "Atividade salva só neste navegador (servidor indisponível).",
-        salvaNoBanco ? "sucesso" : "info"
-    );
-    fecharModalNovaAtividade();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -368,9 +303,6 @@ function limparFormulario() {
 }
 
 window.alterarUnidade = alterarUnidade;
-window.abrirModalNovaAtividade = abrirModalNovaAtividade;
-window.fecharModalNovaAtividade = fecharModalNovaAtividade;
-window.salvarNovaAtividade = salvarNovaAtividade;
 window.aoMudarEquipe = aoMudarEquipe;
 window.aoMudarObra = aoMudarObra;
 window.calcularDesvio = calcularDesvio;
