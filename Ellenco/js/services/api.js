@@ -225,6 +225,33 @@ async function testarServidor() {
     return servidorOnline;
 }
 
+// Envia uma gravação (POST/PUT/DELETE) ao servidor.
+// Se o servidor responder com erro, LANÇA o erro (nunca finge que salvou).
+async function enviar(caminho, metodo, corpo) {
+    let res;
+    try {
+        res = await fetch(`${API_BASE_URL}${caminho}`, {
+            method: metodo,
+            headers: { 'Content-Type': 'application/json' },
+            body: corpo !== undefined ? JSON.stringify(corpo) : undefined
+        });
+    } catch (e) {
+        throw new Error("Não foi possível conectar ao servidor. Verifique a conexão e tente novamente.");
+    }
+
+    let dados = null;
+    try { dados = await res.json(); } catch (e) {}
+
+    if (!res.ok) {
+        console.error(`Erro ${res.status} em ${metodo} ${caminho}:`, dados);
+        if (res.status >= 500) {
+            throw new Error("O servidor não conseguiu salvar. Tente novamente em instantes.");
+        }
+        throw new Error((dados && (dados.error || dados.message)) || `Não foi possível concluir a operação (erro ${res.status}).`);
+    }
+    return dados;
+}
+
 const api = {
     // ==========================================
     // STATUS DO BANCO DE DADOS
@@ -261,16 +288,7 @@ const api = {
 
     async postApontamento(dados) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/apontamentos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) return await res.json();
-            } catch (e) {
-                console.warn("Falha no POST da API:", e);
-            }
+            return await enviar('/apontamentos', 'POST', dados);
         }
 
         const lista = JSON.parse(localStorage.getItem("ellenco_apontamentos")) || DADOS_INICIAIS_APONTAMENTOS;
@@ -295,12 +313,8 @@ const api = {
 
     async deleteApontamento(id) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/apontamentos/${id}`, { method: 'DELETE' });
-                if (res.ok) return true;
-            } catch (e) {
-                console.warn("Falha no DELETE da API:", e);
-            }
+            await enviar(`/apontamentos/${id}`, 'DELETE');
+            return true;
         }
 
         let lista = JSON.parse(localStorage.getItem("ellenco_apontamentos")) || DADOS_INICIAIS_APONTAMENTOS;
@@ -367,14 +381,7 @@ const api = {
 
     async postObra(dados) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/obras`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) return await res.json();
-            } catch (e) {}
+            return await enviar('/obras', 'POST', dados);
         }
         const lista = await this.getObras();
         const nova = { id: Date.now(), ...dados };
@@ -398,14 +405,7 @@ const api = {
 
     async postEquipe(dados) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/equipes`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) return await res.json();
-            } catch (e) {}
+            return await enviar('/equipes', 'POST', dados);
         }
         const lista = await this.getEquipes();
         const nova = { id: Date.now(), ...dados };
@@ -429,14 +429,7 @@ const api = {
 
     async postAtividade(dados) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/atividades`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) return await res.json();
-            } catch (e) {}
+            return await enviar('/atividades', 'POST', dados);
         }
         return null; // servidor indisponível
     },
@@ -456,14 +449,7 @@ const api = {
 
     async postEquipamento(dados) {
         if (await testarServidor()) {
-            try {
-                const res = await fetch(`${API_BASE_URL}/equipamentos`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(dados)
-                });
-                if (res.ok) return await res.json();
-            } catch (e) {}
+            return await enviar('/equipamentos', 'POST', dados);
         }
         const lista = await this.getEquipamentos();
         const novo = { id: Date.now(), ...dados };
@@ -535,12 +521,7 @@ const api = {
 
     async atualizarStatusUsuario(id, status, aprovadoPor = '', motivo = '') {
         if (await testarServidor()) {
-            const res = await fetch(`${API_BASE_URL}/auth/usuarios/${id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status, aprovadoPor, motivo })
-            });
-            if (res.ok) return await res.json();
+            return await enviar(`/auth/usuarios/${id}`, 'PUT', { status, aprovadoPor, motivo });
         }
         return { id, status };
     },

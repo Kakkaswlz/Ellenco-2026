@@ -136,7 +136,7 @@ async function salvarNovaAtividade(e) {
         fecharModalNovaAtividade();
         await carregarAtividades();
     } catch (err) {
-        mostrarToast("Erro ao cadastrar atividade.", "erro");
+        mostrarToast(err.message || "Erro ao cadastrar atividade.", "erro");
     }
 }
 

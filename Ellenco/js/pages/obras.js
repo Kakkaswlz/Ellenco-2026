@@ -106,7 +106,7 @@ async function salvarNovaObra(e) {
         document.getElementById("formNovaObra")?.reset();
         await carregarObras();
     } catch (err) {
-        mostrarToast("Erro ao cadastrar obra.", "erro");
+        mostrarToast(err.message || "Erro ao cadastrar obra.", "erro");
     }
 }
 

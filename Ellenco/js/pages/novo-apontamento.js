@@ -288,7 +288,7 @@ async function registrarApontamento(e) {
 
     } catch (err) {
         console.error("Erro ao registrar apontamento:", err);
-        mostrarToast("Erro ao gravar apontamento no banco.", "erro");
+        mostrarToast(err.message || "Erro ao gravar apontamento no banco.", "erro");
     }
 }
 

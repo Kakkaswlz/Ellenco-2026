@@ -178,7 +178,7 @@ async function excluirApontamento(id) {
         mostrarToast("Registro removido do banco com sucesso.", "info");
         await carregarHistorico();
     } catch (e) {
-        mostrarToast("Erro ao remover registro.", "erro");
+        mostrarToast(e.message || "Erro ao remover registro.", "erro");
     }
 }
 

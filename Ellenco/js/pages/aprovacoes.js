@@ -103,7 +103,7 @@ async function aprovarUsuario(id, nome) {
         mostrarToast(`Acesso de ${nome} aprovado com sucesso!`, "sucesso");
         await carregarUsuarios();
     } catch (e) {
-        mostrarToast("Erro ao aprovar usuário.", "erro");
+        mostrarToast(e.message || "Erro ao aprovar usuário.", "erro");
     }
 }
 
@@ -117,7 +117,7 @@ async function rejeitarUsuario(id, nome) {
         mostrarToast(`Solicitação de ${nome} recusada.`, "warning");
         await carregarUsuarios();
     } catch (e) {
-        mostrarToast("Erro ao atualizar status.", "erro");
+        mostrarToast(e.message || "Erro ao atualizar status.", "erro");
     }
 }
 

@@ -124,7 +124,7 @@ async function salvarNovaEquipe(e) {
         document.getElementById("formNovaEquipe")?.reset();
         await carregarEquipes();
     } catch (err) {
-        mostrarToast("Erro ao cadastrar equipe.", "erro");
+        mostrarToast(err.message || "Erro ao cadastrar equipe.", "erro");
     }
 }
 

@@ -121,7 +121,7 @@ async function salvarNovoEquipamento(e) {
         document.getElementById("formNovoEquipamento")?.reset();
         await carregarEquipamentos();
     } catch (err) {
-        mostrarToast("Erro ao cadastrar equipamento.", "erro");
+        mostrarToast(err.message || "Erro ao cadastrar equipamento.", "erro");
     }
 }
 

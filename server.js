@@ -253,6 +253,11 @@ async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = [
     };
 }
 
+// Valida campos obrigatórios (texto não vazio). Retorna a lista dos que faltam.
+function camposFaltando(body, campos) {
+    return campos.filter(c => body[c] === undefined || body[c] === null || String(body[c]).trim() === '');
+}
+
 const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -413,6 +418,10 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
                 if (method === 'POST') {
                     const body = await parseBody(req);
+                    const faltando = camposFaltando(body, ['nome', 'local', 'eng']);
+                    if (faltando.length) {
+                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                    }
                     const nova = await db.obras.criar(body);
                     return sendJSON(res, nova, 201);
                 }
@@ -437,6 +446,10 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
                 if (method === 'POST') {
                     const body = await parseBody(req);
+                    const faltando = camposFaltando(body, ['nome', 'encarregado', 'atividade']);
+                    if (faltando.length) {
+                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                    }
                     const nova = await db.equipes.criar(body);
                     return sendJSON(res, nova, 201);
                 }
@@ -461,6 +474,10 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
                 if (method === 'POST') {
                     const body = await parseBody(req);
+                    const faltando = camposFaltando(body, ['codigo', 'tipo', 'modelo', 'local']);
+                    if (faltando.length) {
+                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                    }
                     const novo = await db.equipamentos.criar(body);
                     return sendJSON(res, novo, 201);
                 }
@@ -536,6 +553,9 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 const id = parseInt(pathname.split('/')[4], 10);
                 const body = await parseBody(req);
                 const atualizado = await db.usuarios.atualizarStatus(id, body.status, body.aprovadoPor, body.motivo);
+                if (!atualizado) {
+                    return sendJSON(res, { error: 'Usuário não encontrado.' }, 404);
+                }
                 return sendJSON(res, atualizado);
             }
 
@@ -583,6 +603,16 @@ ${JSON.stringify(buscaSemantica, null, 2)}
         }
     } catch (err) {
         console.error('Erro no servidor:', err);
+        const msg = String((err && err.message) || '');
+        if ((err && err.code === '23505') || /UNIQUE constraint failed/i.test(msg)) {
+            return sendJSON(res, { error: 'Já existe um registro com este nome ou código. Use outro.' }, 409);
+        }
+        if ((err && err.code === '23502') || /NOT NULL constraint failed/i.test(msg)) {
+            return sendJSON(res, { error: 'Preencha todos os campos obrigatórios.' }, 400);
+        }
+        if (err && err.code === '22P02') {
+            return sendJSON(res, { error: 'Algum campo foi preenchido com um formato inválido.' }, 400);
+        }
         sendJSON(res, { error: 'Erro interno no servidor', message: err.message }, 500);
     }
 });
