@@ -501,7 +501,12 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                     return sendJSON(res, { error: 'Já existe uma solicitação ou conta com este RE ou E-mail.' }, 409);
                 }
                 const novo = await db.usuarios.cadastrar(body);
-                await db.notificacoes.criar('Nova Solicitação de Cadastro', `${body.nome} (${body.re}) solicitou acesso como ${body.cargo_label}.`, 'aviso');
+                try {
+                    await db.notificacoes.criar('Nova Solicitação de Cadastro', `${body.nome} (${body.re}) solicitou acesso como ${body.cargo_label}.`, 'aviso');
+                } catch (errNotificacao) {
+                    // O cadastro já foi salvo: falha na notificação não pode reportar erro ao usuário
+                    console.warn('Aviso: cadastro salvo, mas a notificação falhou:', errNotificacao.message);
+                }
                 return sendJSON(res, { success: true, usuario: novo }, 201);
             }
 

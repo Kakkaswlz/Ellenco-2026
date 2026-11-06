@@ -156,6 +156,16 @@ async function initDatabase() {
                     console.log('✅ Banco de dados PostgreSQL populado com sucesso!');
                 }
             }
+            // O seed insere registros com ID fixo: sincroniza os contadores de ID
+            // para que novos cadastros não colidam com os IDs já existentes.
+            const TABELAS_COM_ID = ['usuarios', 'obras', 'equipes', 'equipamentos', 'apontamentos', 'notificacoes', 'logs_auditoria', 'atividades'];
+            for (const tabela of TABELAS_COM_ID) {
+                try {
+                    await execSQL(`SELECT setval(pg_get_serial_sequence('${tabela}', 'id'), COALESCE((SELECT MAX(id) FROM ${tabela}), 0) + 1, false)`);
+                } catch (e) {
+                    console.warn(`Aviso: não foi possível sincronizar o contador de ID de ${tabela}:`, e.message);
+                }
+            }
         } else {
             // SQLite initialization
             const SCHEMA_PATH = path.join(__dirname, 'schema.sql');
