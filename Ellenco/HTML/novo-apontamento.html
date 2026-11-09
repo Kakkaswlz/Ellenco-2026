@@ -1,9 +1,9 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ellenco | Novo Apontamento de Produ├º├úo</title>
+    <title>Ellenco | Novo Apontamento de Produção</title>
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,7 +60,7 @@
         <!-- TOPBAR NAVBAR (Injetado via JS) -->
         <header id="topbar"></header>
 
-        <!-- CONTE├ÜDO DO FORMUL├üRIO -->
+        <!-- CONTEÚDO DO FORMULÁRIO -->
         <div class="p-4 md:p-8 max-w-4xl w-full mx-auto animate-fade-in-up">
             
             <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
@@ -70,10 +70,10 @@
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                         <div>
                             <span class="px-3 py-1 rounded-full bg-white/10 text-red-200 text-[11px] font-bold border border-white/10 uppercase tracking-wider">
-                                Boletim Di├írio de Produ├º├úo (BDP)
+                                Boletim Diário de Produção (BDP)
                             </span>
                             <h2 class="text-2xl md:text-3xl font-black mt-2 tracking-tight">Registro de Apontamento de Campo</h2>
-                            <p class="text-xs text-slate-300 mt-1">Grava├º├úo direta no banco de dados SQLite com rec├ílculo autom├ítico de efici├¬ncia.</p>
+                            <p class="text-xs text-slate-300 mt-1">Gravação direta no banco de dados SQLite com recálculo automático de eficiência.</p>
                         </div>
                         <div class="text-right bg-white/10 px-4 py-2.5 rounded-xl backdrop-blur-md border border-white/15 shrink-0">
                             <span class="text-[10px] uppercase font-bold text-slate-300 block">Protocolo Oficial</span>
@@ -82,20 +82,20 @@
                     </div>
                 </div>
 
-                <!-- CORPO DO FORMUL├üRIO -->
+                <!-- CORPO DO FORMULÁRIO -->
                 <div class="p-6 md:p-8">
                     <form id="formApontamento" onsubmit="registrarApontamento(event)" class="space-y-8">
 
-                        <!-- ETAPA 1: IDENTIFICA├ç├âO DA OBRA E EQUIPE -->
+                        <!-- ETAPA 1: IDENTIFICAÇÃO DA OBRA E EQUIPE -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
                                 <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">1</span>
-                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Identifica├º├úo da Frente de Servi├ºo & Equipe</h3>
+                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Identificação da Frente de Serviço & Equipe</h3>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Data da Produ├º├úo *</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Data da Produção *</label>
                                     <input type="date" id="data" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
                                 </div>
 
@@ -104,7 +104,7 @@
                                     <select id="obra" required onchange="aoMudarObra()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold">
                                         <option value="SP-270 Rodovia Raposo Tavares">SP-270 Rodovia Raposo Tavares</option>
                                         <option value="Loteamento Jardim Ellenco">Loteamento Jardim Ellenco</option>
-                                        <option value="Pavimenta├º├úo Industrial">Pavimenta├º├úo Industrial</option>
+                                        <option value="Pavimentação Industrial">Pavimentação Industrial</option>
                                         <option value="Aeroporto Estadual">Aeroporto Estadual</option>
                                     </select>
                                 </div>
@@ -112,32 +112,32 @@
                                 <div>
                                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Turno de Trabalho *</label>
                                     <select id="turno" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
-                                        <option value="Diurno">ÔÿÇ´©Å Diurno (07:00 ├ás 17:00)</option>
-                                        <option value="Noturno">­ƒîÖ Noturno (22:00 ├ás 05:00)</option>
-                                        <option value="Especial">ÔÜí Especial / Plant├úo</option>
+                                        <option value="Diurno">☀️ Diurno (07:00 às 17:00)</option>
+                                        <option value="Noturno">🌙 Noturno (22:00 às 05:00)</option>
+                                        <option value="Especial">⚠️ Especial / Plantão</option>
                                     </select>
                                 </div>
 
                                 <div class="sm:col-span-2">
                                     <label class="block text-xs font-bold text-slate-700 mb-1.5">Equipe de Campo *</label>
                                     <select id="equipe" required onchange="aoMudarEquipe()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800">
-                                        <option value="Equipe Pavimenta├º├úo 01">Equipe Pavimenta├º├úo 01 (Carlos Silva)</option>
+                                        <option value="Equipe Pavimentação 01">Equipe Pavimentação 01 (Carlos Silva)</option>
                                         <option value="Equipe Terraplanagem 02">Equipe Terraplanagem 02 (Marcos Souza)</option>
-                                        <option value="Equipe Drenagem 01">Equipe Drenagem 01 (Jos├® Santos)</option>
-                                        <option value="Equipe Base 03">Equipe Base 03 (Ant├┤nio Ferreira)</option>
+                                        <option value="Equipe Drenagem 01">Equipe Drenagem 01 (José Santos)</option>
+                                        <option value="Equipe Base 03">Equipe Base 03 (Antônio Ferreira)</option>
                                         <option value="Equipe Fresagem 01">Equipe Fresagem 01 (Paulo Lima)</option>
-                                        <option value="Equipe Sinaliza├º├úo Noturna">Equipe Sinaliza├º├úo Noturna (Roberto Dias)</option>
+                                        <option value="Equipe Sinalização Noturna">Equipe Sinalização Noturna (Roberto Dias)</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">L├¡der / Encarregado *</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Líder / Encarregado *</label>
                                     <input type="text" id="encarregado" required value="Carlos Silva" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-semibold">
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ETAPA 2: ATIVIDADE E VOLUMES (C├üLCULO AUTOM├üTICO) -->
+                        <!-- ETAPA 2: ATIVIDADE E VOLUMES (CÁLCULO AUTOMÁTICO) -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
                                 <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">2</span>
@@ -146,19 +146,19 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                                 <div class="sm:col-span-2">
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipo de Servi├ºo / Atividade *</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Tipo de Serviço / Atividade *</label>
                                     <select id="atividade" required onchange="alterarUnidade()" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none font-bold text-slate-800">
-                                        <option value="Pavimenta├º├úo CBUQ - Capa Asf├íltica">Pavimenta├º├úo CBUQ - Capa Asf├íltica (ton)</option>
-                                        <option value="Terraplanagem - Corte e Aterro">Terraplanagem - Corte e Aterro (m┬│)</option>
-                                        <option value="Aplica├º├úo de Brita Graduada (BGS)">Aplica├º├úo de Brita Graduada - BGS (m┬│)</option>
+                                        <option value="Pavimentação CBUQ - Capa Asfáltica">Pavimentação CBUQ - Capa Asfáltica (ton)</option>
+                                        <option value="Terraplanagem - Corte e Aterro">Terraplanagem - Corte e Aterro (m³)</option>
+                                        <option value="Aplicação de Brita Graduada (BGS)">Aplicação de Brita Graduada - BGS (m³)</option>
                                         <option value="Assentamento de Tubos e Galerias">Assentamento de Tubos e Galerias (m)</option>
-                                        <option value="Fresagem de Pavimento Asf├íltico">Fresagem de Pavimento Asf├íltico (m┬▓)</option>
-                                        <option value="Pintura Termopl├ística e Tachas">Pintura Termopl├ística e Sinaliza├º├úo (m┬▓)</option>
+                                        <option value="Fresagem de Pavimento Asfáltico">Fresagem de Pavimento Asfáltico (m²)</option>
+                                        <option value="Pintura Termoplástica e Tachas">Pintura Termoplástica e Sinalização (m²)</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Unidade T├®cnica</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Unidade Técnica</label>
                                     <input type="text" id="unidade" readonly value="ton" class="w-full border border-slate-200 bg-slate-100 text-slate-700 font-bold rounded-xl px-3.5 py-2.5 text-xs outline-none text-center">
                                 </div>
 
@@ -184,13 +184,13 @@
                                     <i id="iconeResultado" class="fa-solid fa-calculator text-2xl text-slate-400"></i>
                                     <div>
                                         <h4 id="textoResultado" class="text-sm font-black text-slate-800">Aguardando preenchimento dos volumes...</h4>
-                                        <p id="detalheResultado" class="text-xs text-slate-500">Insira a meta e a produ├º├úo realizada para ver o c├ílculo autom├ítico.</p>
+                                        <p id="detalheResultado" class="text-xs text-slate-500">Insira a meta e a produção realizada para ver o cálculo automático.</p>
                                     </div>
                                 </div>
 
                                 <div class="flex items-center gap-4 text-right shrink-0">
                                     <div>
-                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Efici├¬ncia</span>
+                                        <span class="text-[10px] text-slate-400 font-bold uppercase block">Eficiência</span>
                                         <span id="resEficiencia" class="text-base font-black text-slate-900">0%</span>
                                     </div>
                                     <div class="border-l border-slate-200 pl-4">
@@ -207,15 +207,15 @@
                             <!-- ALERTA DE TYPO / OUTLIER -->
                             <div id="avisoAlertaTypo" class="hidden p-3 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-800 flex items-center gap-2">
                                 <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base"></i>
-                                <span><strong>Aten├º├úo:</strong> O volume executado ├® muito superior ├á meta programada (+300%). Confirme a digita├º├úo antes de salvar.</span>
+                                <span><strong>Atenção:</strong> O volume executado é muito superior à meta programada (+300%). Confirme a digitação antes de salvar.</span>
                             </div>
                         </div>
 
-                        <!-- ETAPA 3: CONDI├ç├òES OPERACIONAIS & ASSINATURA -->
+                        <!-- ETAPA 3: CONDIÇÕES OPERACIONAIS & ASSINATURA -->
                         <div class="space-y-4">
                             <div class="flex items-center gap-2.5 pb-2 border-b border-slate-100">
                                 <span class="w-6 h-6 rounded-full bg-ellenco-navy text-white text-xs font-black flex items-center justify-center">3</span>
-                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Condi├º├Áes de Campo & Termo Digital</h3>
+                                <h3 class="text-sm font-extrabold text-slate-900 uppercase tracking-wider">Condições de Campo & Termo Digital</h3>
                             </div>
 
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -225,23 +225,23 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Condi├º├úo Clim├ítica *</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Condição Climática *</label>
                                     <select id="clima" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
-                                        <option value="Ensolarado">ÔÿÇ´©Å Ensolarado / Bom Tempo</option>
-                                        <option value="Nublado">Ôøà Nublado</option>
-                                        <option value="Chuva Leve">­ƒîª´©Å Chuva Leve (Solo ├Ümido)</option>
-                                        <option value="Chuva Forte (Parado)">­ƒîº´©Å Chuva Forte (Opera├º├úo Parada)</option>
+                                        <option value="Ensolarado">☀️ Ensolarado / Bom Tempo</option>
+                                        <option value="Nublado">☁️ Nublado</option>
+                                        <option value="Chuva Leve">🌦️ Chuva Leve (Solo Úmido)</option>
+                                        <option value="Chuva Forte (Parado)">🌧️ Chuva Forte (Operação Parada)</option>
                                     </select>
                                 </div>
 
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Motivo de Paralisa├º├úo</label>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1.5">Motivo de Paralisação</label>
                                     <select id="motivoParada" class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 text-xs outline-none">
-                                        <option value="Nenhum">Nenhum (Produ├º├úo Cont├¡nua)</option>
-                                        <option value="Manuten├º├úo de Equipamento">Manuten├º├úo de Equipamento</option>
+                                        <option value="Nenhum">Nenhum (Produção Contínua)</option>
+                                        <option value="Manutenção de Equipamento">Manutenção de Equipamento</option>
                                         <option value="Falta de Insumo / Usina">Atraso de Insumos / Usina</option>
-                                        <option value="Chuva / Clima">Interfer├¬ncia Clim├ítica</option>
-                                        <option value="Interfer├¬ncia de Tr├ífego">Interfer├¬ncia de Tr├ífego</option>
+                                        <option value="Chuva / Clima">Interferência Climática</option>
+                                        <option value="Interferência de Tráfego">Interferência de Tráfego</option>
                                     </select>
                                 </div>
                             </div>
@@ -251,8 +251,8 @@
                                 <div class="flex items-center gap-2.5">
                                     <i class="fa-solid fa-cloud-sun text-blue-600 text-lg"></i>
                                     <div>
-                                        <p class="text-xs font-bold text-blue-950">Preenchimento Meteorol├│gico Inteligente</p>
-                                        <p class="text-[11px] text-blue-700">Consulte a API Open-Meteo para preencher as condi├º├Áes da obra automaticamente.</p>
+                                        <p class="text-xs font-bold text-blue-950">Preenchimento Meteorológico Inteligente</p>
+                                        <p class="text-[11px] text-blue-700">Consulte a API Open-Meteo para preencher as condições da obra automaticamente.</p>
                                     </div>
                                 </div>
                                 <button type="button" onclick="puxarClimaParaFormulario()" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer shrink-0">
@@ -261,8 +261,8 @@
                             </div>
 
                             <div>
-                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Observa├º├Áes Operacionais & Ocorr├¬ncias</label>
-                                <textarea id="observacao" rows="3" placeholder="Relate detalhes importantes da jornada, trecho trabalhado (km), ocorr├¬ncias mec├ónicas ou justificativas de desvio..." class="w-full border border-slate-300 rounded-xl p-3 text-xs outline-none resize-none"></textarea>
+                                <label class="block text-xs font-bold text-slate-700 mb-1.5">Observações Operacionais & Ocorrências</label>
+                                <textarea id="observacao" rows="3" placeholder="Relate detalhes importantes da jornada, trecho trabalhado (km), ocorrências mecânicas ou justificativas de desvio..." class="w-full border border-slate-300 rounded-xl p-3 text-xs outline-none resize-none"></textarea>
                             </div>
 
                             <!-- ASSINATURA DIGITAL -->
@@ -270,8 +270,8 @@
                                 <div class="flex items-center gap-3">
                                     <i class="fa-solid fa-signature text-2xl text-ellenco-navy"></i>
                                     <div>
-                                        <p class="text-xs font-bold text-slate-900">Termo de Valida├º├úo do Respons├ível</p>
-                                        <p class="text-[11px] text-slate-500">Declaro que as medi├º├Áes prestadas correspondem fielmente ├á produ├º├úo executada em campo.</p>
+                                        <p class="text-xs font-bold text-slate-900">Termo de Validação do Responsável</p>
+                                        <p class="text-[11px] text-slate-500">Declaro que as medições prestadas correspondem fielmente à produção executada em campo.</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2">
@@ -281,7 +281,7 @@
                             </div>
                         </div>
 
-                        <!-- BOT├òES DE A├ç├âO -->
+                        <!-- BOTÕES DE AÇÃO -->
                         <div class="flex flex-col sm:flex-row justify-end items-center gap-3 pt-4 border-t border-slate-100">
                             <button type="button" onclick="limparFormulario()" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 text-xs font-bold transition-colors cursor-pointer">
                                 Limpar Campos
