@@ -1,4 +1,4 @@
-/* ==================================================================== */
+﻿/* ==================================================================== */
 /* ELLENCO - ATIVIDADES.JS                                              */
 /* Controlador da Listagem e Cadastro de Atividades (serviço + unidade) */
 /* ==================================================================== */
@@ -6,6 +6,7 @@
 const ATIVIDADES_PADRAO_LISTA = [
     { nome: "Pavimentação CBUQ - Capa Asfáltica", unidade: "ton" },
     { nome: "Terraplanagem - Corte e Aterro", unidade: "m³" },
+    { nome: "Locação e Execução por Estacas", unidade: "estacas" },
     { nome: "Aplicação de Brita Graduada (BGS)", unidade: "m³" },
     { nome: "Assentamento de Tubos e Galerias", unidade: "m" },
     { nome: "Fresagem de Pavimento Asfáltico", unidade: "m²" },
@@ -49,7 +50,7 @@ function gravarAtividadeLocal(nome, unidade) {
 async function carregarAtividades() {
     try {
         const doBanco = await api.getAtividades();
-        const lista = Array.isArray(doBanco)
+        const lista = Array.isArray(doBanco) && doBanco.length
             ? doBanco.map(a => ({ nome: a.nome, unidade: a.unidade, local: false }))
             : ATIVIDADES_PADRAO_LISTA.map(a => ({ ...a, local: false }));
 
