@@ -19,7 +19,7 @@ try {
     dotenv.config({ path: path.join(__dirname, 'Assistente-Ellenco', '.env') });
     dotenv.config({ path: path.join(__dirname, '.env') });
 } catch (e) {
-    console.warn('Dotenv não carregado, usando variáveis de ambiente do sistema.');
+    console.warn('Dotenv n├úo carregado, usando vari├íveis de ambiente do sistema.');
 }
 
 // Inicializa cliente Gemini SDK
@@ -30,7 +30,7 @@ try {
         genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     }
 } catch (e) {
-    console.warn('GoogleGenAI SDK não inicializado:', e.message);
+    console.warn('GoogleGenAI SDK n├úo inicializado:', e.message);
 }
 
 const PORT = process.env.PORT || 3000;
@@ -84,7 +84,7 @@ function parseBody(req) {
 }
 
 /**
- * Motor Analítico Inteligente de Consulta Local ao SQLite
+ * Motor Anal├¡tico Inteligente de Consulta Local ao SQLite
  * Responde com 100% de fidelidade aos dados reais mesmo se a API externa do Gemini estiver offline.
  */
 async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = []) {
@@ -96,53 +96,53 @@ async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = [
     const frota = contexto.frota;
     const ocorrencias = contexto.ocorrenciasERecorrencias;
 
-    // 1. SOLICITAÇÃO DE GRÁFICO / DASHBOARD
-    if (msg.includes('gráfico') || msg.includes('grafico') || msg.includes('dashboard') || msg.includes('visualização') || msg.includes('curva')) {
+    // 1. SOLICITA├ç├âO DE GR├üFICO / DASHBOARD
+    if (msg.includes('gr├ífico') || msg.includes('grafico') || msg.includes('dashboard') || msg.includes('visualiza├º├úo') || msg.includes('curva')) {
         if (msg.includes('equipe') || msg.includes('desempenho')) {
             const labels = equipes.map(e => e.nome);
             const realizados = equipes.map(e => e.realizadoAcumulado);
             return {
-                resposta: `Aqui está o gráfico comparativo de produção acumulada por equipe de campo:\n\n- **Equipes Analisadas**: ${equipes.length} frentes ativas.\n- **Maior Volume**: ${equipes[0]?.nome} com ${equipes[0]?.realizadoAcumulado?.toLocaleString('pt-BR')} unidades.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Produção Acumulada por Equipe",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(realizados)},\n  "unidade": "Volume Acumulado"\n}\n\`\`\``
+                resposta: `Aqui est├í o gr├ífico comparativo de produ├º├úo acumulada por equipe de campo:\n\n- **Equipes Analisadas**: ${equipes.length} frentes ativas.\n- **Maior Volume**: ${equipes[0]?.nome} com ${equipes[0]?.realizadoAcumulado?.toLocaleString('pt-BR')} unidades.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Produ├º├úo Acumulada por Equipe",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(realizados)},\n  "unidade": "Volume Acumulado"\n}\n\`\`\``
             };
         } else if (msg.includes('obra') || msg.includes('contrato') || msg.includes('frente')) {
             const labels = obras.map(o => o.nome.replace('Rodovia ', ''));
             const progressos = obras.map(o => parseFloat(o.progresso));
             return {
-                resposta: `Aqui está o gráfico de avanço físico percentual dos contratos:\n\n- **Total de Contratos**: ${obras.length} frentes ativas.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Avanço Físico dos Contratos (%)",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(progressos)},\n  "unidade": "% Concluído"\n}\n\`\`\``
+                resposta: `Aqui est├í o gr├ífico de avan├ºo f├¡sico percentual dos contratos:\n\n- **Total de Contratos**: ${obras.length} frentes ativas.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Avan├ºo F├¡sico dos Contratos (%)",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(progressos)},\n  "unidade": "% Conclu├¡do"\n}\n\`\`\``
             };
         } else {
-            // Curva diária de produção
+            // Curva di├íria de produ├º├úo
             const ordenados = [...bdp].reverse();
             const labels = ordenados.map(a => a.data.split('-').slice(1).join('/'));
             const planejados = ordenados.map(a => parseFloat(a.planejado));
             const realizados = ordenados.map(a => parseFloat(a.realizado));
             return {
-                resposta: `Gerando gráfico comparativo de produção diária (Meta vs Realizado):\n\n- **Total Planejado no Período**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Total Realizado no Período**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Eficiência Média**: ${kpis.eficiencia}%\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Meta Planejada vs Produção Realizada",\n  "labels": ${JSON.stringify(labels)},\n  "datasets": [\n    {\n      "label": "Meta Programada",\n      "data": ${JSON.stringify(planejados)},\n      "backgroundColor": "#94A3B8"\n    },\n    {\n      "label": "Realizado em Campo",\n      "data": ${JSON.stringify(realizados)},\n      "backgroundColor": "#0A2342"\n    }\n  ]\n}\n\`\`\``
+                resposta: `Gerando gr├ífico comparativo de produ├º├úo di├íria (Meta vs Realizado):\n\n- **Total Planejado no Per├¡odo**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Total Realizado no Per├¡odo**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Efici├¬ncia M├®dia**: ${kpis.eficiencia}%\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Meta Planejada vs Produ├º├úo Realizada",\n  "labels": ${JSON.stringify(labels)},\n  "datasets": [\n    {\n      "label": "Meta Programada",\n      "data": ${JSON.stringify(planejados)},\n      "backgroundColor": "#94A3B8"\n    },\n    {\n      "label": "Realizado em Campo",\n      "data": ${JSON.stringify(realizados)},\n      "backgroundColor": "#0A2342"\n    }\n  ]\n}\n\`\`\``
             };
         }
     }
 
-    // 2. ÚLTIMOS REGISTROS / ÚLTIMO APONTAMENTO
-    if (msg.includes('último') || msg.includes('ultimo') || msg.includes('recentes') || msg.includes('novos registros') || msg.includes('novo registro')) {
+    // 2. ├ÜLTIMOS REGISTROS / ├ÜLTIMO APONTAMENTO
+    if (msg.includes('├║ltimo') || msg.includes('ultimo') || msg.includes('recentes') || msg.includes('novos registros') || msg.includes('novo registro')) {
         const ult = bdp[0];
         if (!ult) {
-            return { resposta: "Não há nenhum apontamento registrado no banco de dados atualmente." };
+            return { resposta: "N├úo h├í nenhum apontamento registrado no banco de dados atualmente." };
         }
-        let texto = `📋 **Último Boletim Diário de Produção (BDP) Registrado:**\n\n`;
+        let texto = `­ƒôï **├Ültimo Boletim Di├írio de Produ├º├úo (BDP) Registrado:**\n\n`;
         texto += `- **Protocolo**: \`${ult.protocolo}\`\n`;
         texto += `- **Data & Turno**: ${ult.data} (${ult.turno})\n`;
         texto += `- **Obra**: ${ult.obra}\n`;
-        texto += `- **Equipe**: ${ult.equipe} (Líder: ${ult.encarregado})\n`;
+        texto += `- **Equipe**: ${ult.equipe} (L├¡der: ${ult.encarregado})\n`;
         texto += `- **Atividade**: ${ult.atividade}\n`;
         texto += `- **Meta**: ${ult.planejado} | **Realizado**: ${ult.realizado}\n`;
-        texto += `- **Desvio**: **${ult.desvioPercentual}** (Eficiência: ${ult.eficiencia})\n`;
+        texto += `- **Desvio**: **${ult.desvioPercentual}** (Efici├¬ncia: ${ult.eficiencia})\n`;
         texto += `- **Produtividade**: ${ult.produtividadeHora}\n`;
-        texto += `- **Condição Climática**: ${ult.clima}\n`;
+        texto += `- **Condi├º├úo Clim├ítica**: ${ult.clima}\n`;
         if (ult.parada && ult.parada !== 'Nenhum') {
-            texto += `- **Ocorrência/Parada**: ⚠️ *${ult.parada}*\n`;
+            texto += `- **Ocorr├¬ncia/Parada**: ÔÜá´©Å *${ult.parada}*\n`;
         }
         if (ult.observacao) {
-            texto += `- **Observações**: _"${ult.observacao}"_\n`;
+            texto += `- **Observa├º├Áes**: _"${ult.observacao}"_\n`;
         }
         return { resposta: texto };
     }
@@ -150,50 +150,50 @@ async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = [
     // 3. QUANTIDADE DE REGISTROS / CONTAGEM
     if (msg.includes('quantos registros') || msg.includes('total de registros') || msg.includes('quantidade de registros') || msg.includes('quantos apontamentos')) {
         return {
-            resposta: `Atualmente temos **${kpis.totalRegistros} boletins diários de produção (BDP)** registrados no banco de dados SQLite.\n\n- **Volume Total Planejado**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Volume Total Realizado**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Eficiência Geral**: ${kpis.eficiencia}%\n- **Desvio Operacional Geral**: ${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%`
+            resposta: `Atualmente temos **${kpis.totalRegistros} boletins di├írios de produ├º├úo (BDP)** registrados no banco de dados SQLite.\n\n- **Volume Total Planejado**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Volume Total Realizado**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Efici├¬ncia Geral**: ${kpis.eficiencia}%\n- **Desvio Operacional Geral**: ${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%`
         };
     }
 
-    // 4. OCORRÊNCIAS / PROBLEMAS / PARADAS
-    if (msg.includes('problema') || msg.includes('ocorrencia') || msg.includes('ocorrência') || msg.includes('parada') || msg.includes('paralis') || msg.includes('quebr') || msg.includes('falha') || msg.includes('critico') || msg.includes('crítico')) {
+    // 4. OCORR├èNCIAS / PROBLEMAS / PARADAS
+    if (msg.includes('problema') || msg.includes('ocorrencia') || msg.includes('ocorr├¬ncia') || msg.includes('parada') || msg.includes('paralis') || msg.includes('quebr') || msg.includes('falha') || msg.includes('critico') || msg.includes('cr├¡tico')) {
         if (!ocorrencias.length) {
-            return { resposta: "Não há registros de paralisações ou desvios críticos recentes no banco de dados. Todas as frentes de produção operaram normalmente." };
+            return { resposta: "N├úo h├í registros de paralisa├º├Áes ou desvios cr├¡ticos recentes no banco de dados. Todas as frentes de produ├º├úo operaram normalmente." };
         }
-        let texto = `⚠️ **Ocorrências e Paralisações Registradas no Banco:**\n\n`;
+        let texto = `ÔÜá´©Å **Ocorr├¬ncias e Paralisa├º├Áes Registradas no Banco:**\n\n`;
         ocorrencias.forEach(o => {
-            texto += `• **${o.data} - ${o.obra} (${o.equipe})**:\n`;
+            texto += `ÔÇó **${o.data} - ${o.obra} (${o.equipe})**:\n`;
             if (o.motivoParada && o.motivoParada !== 'Nenhum') {
                 texto += `  - Motivo: **${o.motivoParada}**\n`;
             }
             if (o.detalhes) {
                 texto += `  - Detalhes: _"${o.detalhes}"_\n`;
             }
-            texto += `  - Variação/Desvio: **${o.desvio}**\n\n`;
+            texto += `  - Varia├º├úo/Desvio: **${o.desvio}**\n\n`;
         });
         return { resposta: texto };
     }
 
-    // 5. EQUIPAMENTOS / FROTA / MANUTENÇÃO
-    if (msg.includes('equipamento') || msg.includes('frota') || msg.includes('maquina') || msg.includes('máquina') || msg.includes('horimetro') || msg.includes('horímetro') || msg.includes('manutenção') || msg.includes('manutencao')) {
-        let texto = `🚜 **Status da Frota & Maquinários (SQLite):**\n\n`;
-        texto += `- **Frota Total**: ${frota.total} máquinas cadastradas\n`;
+    // 5. EQUIPAMENTOS / FROTA / MANUTEN├ç├âO
+    if (msg.includes('equipamento') || msg.includes('frota') || msg.includes('maquina') || msg.includes('m├íquina') || msg.includes('horimetro') || msg.includes('hor├¡metro') || msg.includes('manuten├º├úo') || msg.includes('manutencao')) {
+        let texto = `­ƒÜ£ **Status da Frota & Maquin├írios (SQLite):**\n\n`;
+        texto += `- **Frota Total**: ${frota.total} m├íquinas cadastradas\n`;
         texto += `- **Operando em Campo**: ${frota.operando} equipamentos (${Math.round((frota.operando / frota.total) * 100)}% de disponibilidade)\n`;
         if (frota.emManutencao.length) {
-            texto += `- **Em Manutenção**: ${frota.emManutencao.length} máquina(s):\n`;
+            texto += `- **Em Manuten├º├úo**: ${frota.emManutencao.length} m├íquina(s):\n`;
             frota.emManutencao.forEach(m => {
-                texto += `  • 🔧 ${m}\n`;
+                texto += `  ÔÇó ­ƒöº ${m}\n`;
             });
         } else {
-            texto += `- **Em Manutenção**: Nenhuma máquina parada no momento.\n`;
+            texto += `- **Em Manuten├º├úo**: Nenhuma m├íquina parada no momento.\n`;
         }
         return { resposta: texto };
     }
 
     // 6. EQUIPES / PRODUTIVIDADE / DESEMPENHO
-    if (msg.includes('equipe') || msg.includes('líder') || msg.includes('lider') || msg.includes('encarregado') || msg.includes('efetivo')) {
-        let texto = `👥 **Desempenho das Equipes de Campo:**\n\n`;
+    if (msg.includes('equipe') || msg.includes('l├¡der') || msg.includes('lider') || msg.includes('encarregado') || msg.includes('efetivo')) {
+        let texto = `­ƒæÑ **Desempenho das Equipes de Campo:**\n\n`;
         equipes.forEach(eq => {
-            texto += `• **${eq.nome}** (Líder: ${eq.lider})\n`;
+            texto += `ÔÇó **${eq.nome}** (L├¡der: ${eq.lider})\n`;
             texto += `  - Atividade: ${eq.atividade} | Obra: ${eq.obra}\n`;
             texto += `  - Efetivo: ${eq.integrantes} colaboradores | Status: **${eq.status}**\n`;
             texto += `  - Acumulado: ${eq.realizadoAcumulado?.toLocaleString('pt-BR')} de ${eq.metaAcumulada?.toLocaleString('pt-BR')} programadas\n\n`;
@@ -203,57 +203,57 @@ async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = [
 
     // 7. OBRAS / CONTRATOS / FRENTES
     if (msg.includes('obra') || msg.includes('contrato') || msg.includes('frente') || msg.includes('rodovia') || msg.includes('raposo') || msg.includes('aeroporto') || msg.includes('industrial') || msg.includes('jardim')) {
-        let texto = `🏗️ **Acompanhamento de Obras & Contratos:**\n\n`;
+        let texto = `­ƒÅù´©Å **Acompanhamento de Obras & Contratos:**\n\n`;
         obras.forEach(ob => {
-            texto += `• **${ob.nome}**\n`;
+            texto += `ÔÇó **${ob.nome}**\n`;
             texto += `  - Local: ${ob.local}\n`;
-            texto += `  - Responsável: ${ob.responsavel}\n`;
-            texto += `  - Avanço Físico: **${ob.progresso}** (${ob.status})\n`;
+            texto += `  - Respons├ível: ${ob.responsavel}\n`;
+            texto += `  - Avan├ºo F├¡sico: **${ob.progresso}** (${ob.status})\n`;
             texto += `  - Volume Contratado: ${ob.volume}\n\n`;
         });
         return { resposta: texto };
     }
 
-    // 8. KPIS GERAIS / RESUMO DA PRODUÇÃO / INDICADORES
-    if (msg.includes('kpi') || msg.includes('indicador') || msg.includes('eficiencia') || msg.includes('eficiência') || msg.includes('desvio') || msg.includes('resumo') || msg.includes('hoje') || msg.includes('produção') || msg.includes('producao')) {
-        let texto = `📊 **Resumo Consolidado de Produção (Base SQLite):**\n\n`;
+    // 8. KPIS GERAIS / RESUMO DA PRODU├ç├âO / INDICADORES
+    if (msg.includes('kpi') || msg.includes('indicador') || msg.includes('eficiencia') || msg.includes('efici├¬ncia') || msg.includes('desvio') || msg.includes('resumo') || msg.includes('hoje') || msg.includes('produ├º├úo') || msg.includes('producao')) {
+        let texto = `­ƒôè **Resumo Consolidado de Produ├º├úo (Base SQLite):**\n\n`;
         texto += `- **Meta Programada**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n`;
-        texto += `- **Produção Realizada**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n`;
-        texto += `- **Eficiência Geral**: **${kpis.eficiencia}%**\n`;
+        texto += `- **Produ├º├úo Realizada**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n`;
+        texto += `- **Efici├¬ncia Geral**: **${kpis.eficiencia}%**\n`;
         texto += `- **Desvio Operacional**: **${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%**\n`;
-        texto += `- **Produtividade Média**: ${kpis.produtividadeMedia} /h\n`;
+        texto += `- **Produtividade M├®dia**: ${kpis.produtividadeMedia} /h\n`;
         texto += `- **Horas Totais Apontadas**: ${kpis.totalHoras} h\n`;
         texto += `- **Desempenho**: ${kpis.acima} equipes acima da meta, ${kpis.naMeta} na meta, ${kpis.abaixo} abaixo.\n`;
         return { resposta: texto };
     }
 
-    // 8.5. BUSCA ESPECÍFICA / SEMÂNTICA EM REGISTROS
+    // 8.5. BUSCA ESPEC├ìFICA / SEM├éNTICA EM REGISTROS
     const registrosEncontrados = await db.apontamentos.buscarSemantico(mensagem);
     if (registrosEncontrados && registrosEncontrados.length > 0) {
-        let texto = `🔎 **Localizei ${registrosEncontrados.length} registro(s) no banco de dados relacionado(s) à sua consulta:**\n\n`;
+        let texto = `­ƒöÄ **Localizei ${registrosEncontrados.length} registro(s) no banco de dados relacionado(s) ├á sua consulta:**\n\n`;
         registrosEncontrados.forEach(r => {
-            texto += `• **Protocolo \`${r.protocolo || 'BDP-' + r.id}\`** (${r.data} - ${r.obra}):\n`;
+            texto += `ÔÇó **Protocolo \`${r.protocolo || 'BDP-' + r.id}\`** (${r.data} - ${r.obra}):\n`;
             texto += `  - Equipe: **${r.equipe}** (${r.encarregado})\n`;
             texto += `  - Atividade: ${r.atividade}\n`;
             texto += `  - Realizado: **${r.realizado} ${r.unidade}** (Meta: ${r.planejado} ${r.unidade}, Desvio: **${r.desvio}%**)\n`;
             if (r.parada && r.parada !== 'Nenhum') {
-                texto += `  - Ocorrência/Parada: ⚠️ **${r.parada}**\n`;
+                texto += `  - Ocorr├¬ncia/Parada: ÔÜá´©Å **${r.parada}**\n`;
             }
             if (r.obs) {
-                texto += `  - Observações: _"${r.obs}"_\n`;
+                texto += `  - Observa├º├Áes: _"${r.obs}"_\n`;
             }
             texto += `\n`;
         });
         return { resposta: texto.trim() };
     }
 
-    // 9. RESPOSTA PADRÃO INTELIGENTE
+    // 9. RESPOSTA PADR├âO INTELIGENTE
     return {
-        resposta: `Sou o **Assistente Inteligente da Ellenco**, conectado em tempo real ao banco de dados SQLite.\n\nAtualmente temos **${kpis.totalRegistros} boletins de produção** registrados, com **${kpis.totalRealizado.toLocaleString('pt-BR')} unidades produzidas** (${kpis.eficiencia}% de eficiência global) em **${obras.length} contratos ativos**.\n\nVocê pode me perguntar sobre:\n- *\"Quais foram os últimos apontamentos?\"*\n- *\"Existe algum equipamento em manutenção?\"*\n- *\"Quais ocorrências ou paradas foram relatadas?\"*\n- *\"Qual é o avanço físico das obras?\"*\n- *\"Gerar gráfico de produção diária\"*`
+        resposta: `Sou o **Assistente Inteligente da Ellenco**, conectado em tempo real ao banco de dados SQLite.\n\nAtualmente temos **${kpis.totalRegistros} boletins de produ├º├úo** registrados, com **${kpis.totalRealizado.toLocaleString('pt-BR')} unidades produzidas** (${kpis.eficiencia}% de efici├¬ncia global) em **${obras.length} contratos ativos**.\n\nVoc├¬ pode me perguntar sobre:\n- *\"Quais foram os ├║ltimos apontamentos?\"*\n- *\"Existe algum equipamento em manuten├º├úo?\"*\n- *\"Quais ocorr├¬ncias ou paradas foram relatadas?\"*\n- *\"Qual ├® o avan├ºo f├¡sico das obras?\"*\n- *\"Gerar gr├ífico de produ├º├úo di├íria\"*`
     };
 }
 
-// Valida campos obrigatórios (texto não vazio). Retorna a lista dos que faltam.
+// Valida campos obrigat├│rios (texto n├úo vazio). Retorna a lista dos que faltam.
 function camposFaltando(body, campos) {
     return campos.filter(c => body[c] === undefined || body[c] === null || String(body[c]).trim() === '');
 }
@@ -288,25 +288,25 @@ const server = http.createServer(async (req, res) => {
                 const usuarioLogado = body.usuarioLogado || body.user || { nome: 'Carlos Silva', cargo: 'Encarregado de Equipe' };
 
                 if (!mensagem) {
-                    return sendJSON(res, { erro: 'Mensagem não informada.' }, 400);
+                    return sendJSON(res, { erro: 'Mensagem n├úo informada.' }, 400);
                 }
 
                 // 1. Coleta Snapshot em tempo real do SQLite
                 const contextoCompleto = await db.obterContextoParaIA(usuarioLogado);
                 const buscaSemantica = await db.apontamentos.buscarSemantico(mensagem);
 
-                // 2. Tenta processar via Google GenAI (Gemini) se disponível
+                // 2. Tenta processar via Google GenAI (Gemini) se dispon├¡vel
                 if (genAI && process.env.GEMINI_API_KEY) {
                     try {
                         const promptSistema = `
-Você é o Assistente Inteligente Oficial da plataforma Ellenco Construções e Pavimentação.
-Sua função é ajudar os colaboradores e gestores a compreender, consultar e analisar as informações operacionais de campo.
+Voc├¬ ├® o Assistente Inteligente Oficial da plataforma Ellenco Constru├º├Áes e Pavimenta├º├úo.
+Sua fun├º├úo ├® ajudar os colaboradores e gestores a compreender, consultar e analisar as informa├º├Áes operacionais de campo.
 
 REGRAS DE CONFIABILIDADE:
-- Você possui acesso direto aos dados reais da empresa fornecidos abaixo.
-- NUNCA invente números, datas, obras, equipes ou registros fictícios.
-- Sempre responda em português brasileiro de forma direta, clara e profissional.
-- Se o usuário pedir gráficos, gere um bloco com formato JSON contendo {"tipo": "bar"|"doughnut", "titulo": "...", "labels": [...], "valores": [...]} para que a interface renderize o Chart.js.
+- Voc├¬ possui acesso direto aos dados reais da empresa fornecidos abaixo.
+- NUNCA invente n├║meros, datas, obras, equipes ou registros fict├¡cios.
+- Sempre responda em portugu├¬s brasileiro de forma direta, clara e profissional.
+- Se o usu├írio pedir gr├íficos, gere um bloco com formato JSON contendo {"tipo": "bar"|"doughnut", "titulo": "...", "labels": [...], "valores": [...]} para que a interface renderize o Chart.js.
 
 SNAPSHOT EM TEMPO REAL DO BANCO DE DADOS SQLITE (ELLENCO):
 ${JSON.stringify(contextoCompleto, null, 2)}
@@ -331,15 +331,15 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                             });
                         }
                     } catch (genAiError) {
-                        console.warn('Fallback para motor analítico local devido a:', genAiError.message);
+                        console.warn('Fallback para motor anal├¡tico local devido a:', genAiError.message);
                     }
                 }
 
-                // 3. Motor Analítico Local Nativo (100% Determinístico, baseado nos dados reais do SQLite)
+                // 3. Motor Anal├¡tico Local Nativo (100% Determin├¡stico, baseado nos dados reais do SQLite)
                 const resultadoLocal = await processarConsultaAnaliticaLocal(mensagem, contextoCompleto, historico);
                 return sendJSON(res, {
                     resposta: resultadoLocal.resposta,
-                    fonte: 'Motor Analítico Ellenco (SQLite)',
+                    fonte: 'Motor Anal├¡tico Ellenco (SQLite)',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -369,7 +369,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 if (method === 'POST') {
                     const body = await parseBody(req);
                     if (!body.obra || !body.equipe || !body.planejado || !body.realizado) {
-                        return sendJSON(res, { error: 'Campos obrigatórios ausentes.' }, 400);
+                        return sendJSON(res, { error: 'Campos obrigat├│rios ausentes.' }, 400);
                     }
                     const novo = await db.apontamentos.criar(body);
                     return sendJSON(res, novo, 201);
@@ -380,7 +380,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 const id = parseInt(pathname.split('/')[3], 10);
                 if (method === 'GET') {
                     const item = await db.apontamentos.buscarPorId(id);
-                    if (!item) return sendJSON(res, { error: 'Apontamento não encontrado' }, 404);
+                    if (!item) return sendJSON(res, { error: 'Apontamento n├úo encontrado' }, 404);
                     return sendJSON(res, item);
                 }
                 if (method === 'PUT') {
@@ -394,7 +394,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
             }
 
-            // 3b. ATIVIDADES (catálogo)
+            // 3b. ATIVIDADES (cat├ílogo)
             if (pathname === '/api/atividades') {
                 if (method === 'GET') {
                     return sendJSON(res, await db.atividades.listar());
@@ -404,7 +404,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                     const nome = String(body.nome || '').trim().slice(0, 80);
                     const unidade = String(body.unidade || '').trim().slice(0, 10);
                     if (!nome || !unidade) {
-                        return sendJSON(res, { error: 'Nome e unidade são obrigatórios.' }, 400);
+                        return sendJSON(res, { error: 'Nome e unidade s├úo obrigat├│rios.' }, 400);
                     }
                     const nova = await db.atividades.criar({ nome, unidade });
                     return sendJSON(res, nova, nova.jaExistia ? 200 : 201);
@@ -420,7 +420,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                     const body = await parseBody(req);
                     const faltando = camposFaltando(body, ['nome', 'local', 'eng']);
                     if (faltando.length) {
-                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                        return sendJSON(res, { error: 'Preencha os campos obrigat├│rios: ' + faltando.join(', ') + '.' }, 400);
                     }
                     const nova = await db.obras.criar(body);
                     return sendJSON(res, nova, 201);
@@ -448,7 +448,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                     const body = await parseBody(req);
                     const faltando = camposFaltando(body, ['nome', 'encarregado', 'atividade']);
                     if (faltando.length) {
-                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                        return sendJSON(res, { error: 'Preencha os campos obrigat├│rios: ' + faltando.join(', ') + '.' }, 400);
                     }
                     const nova = await db.equipes.criar(body);
                     return sendJSON(res, nova, 201);
@@ -476,7 +476,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                     const body = await parseBody(req);
                     const faltando = camposFaltando(body, ['codigo', 'tipo', 'modelo', 'local']);
                     if (faltando.length) {
-                        return sendJSON(res, { error: 'Preencha os campos obrigatórios: ' + faltando.join(', ') + '.' }, 400);
+                        return sendJSON(res, { error: 'Preencha os campos obrigat├│rios: ' + faltando.join(', ') + '.' }, 400);
                     }
                     const novo = await db.equipamentos.criar(body);
                     return sendJSON(res, novo, 201);
@@ -495,18 +495,18 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 }
             }
 
-            // 7. AUTENTICAÇÃO & GESTÃO DE USUÁRIOS
+            // 7. AUTENTICA├ç├âO & GEST├âO DE USU├üRIOS
             if (pathname === '/api/auth/login' && method === 'POST') {
                 const body = await parseBody(req);
                 const usuario = await db.usuarios.autenticar(body.re || body.email, body.senha);
                 if (!usuario) {
-                    return sendJSON(res, { error: 'Credenciais inválidas. Verifique seu RE/E-mail e senha.' }, 401);
+                    return sendJSON(res, { error: 'Credenciais inv├ílidas. Verifique seu RE/E-mail e senha.' }, 401);
                 }
                 if (usuario.status === 'pendente') {
-                    return sendJSON(res, { error: 'Cadastro aguardando aprovação do cargo superior.', status: 'pendente' }, 403);
+                    return sendJSON(res, { error: 'Cadastro aguardando aprova├º├úo do cargo superior.', status: 'pendente' }, 403);
                 }
                 if (usuario.status === 'rejeitado') {
-                    return sendJSON(res, { error: 'Solicitação de acesso recusada pela diretoria.', status: 'rejeitado' }, 403);
+                    return sendJSON(res, { error: 'Solicita├º├úo de acesso recusada pela diretoria.', status: 'rejeitado' }, 403);
                 }
                 return sendJSON(res, { success: true, usuario });
             }
@@ -515,14 +515,14 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 const body = await parseBody(req);
                 const existente = await db.usuarios.buscarPorREouEmail(body.re || body.email);
                 if (existente) {
-                    return sendJSON(res, { error: 'Já existe uma solicitação ou conta com este RE ou E-mail.' }, 409);
+                    return sendJSON(res, { error: 'J├í existe uma solicita├º├úo ou conta com este RE ou E-mail.' }, 409);
                 }
                 const novo = await db.usuarios.cadastrar(body);
                 try {
-                    await db.notificacoes.criar('Nova Solicitação de Cadastro', `${body.nome} (${body.re}) solicitou acesso como ${body.cargo_label}.`, 'aviso');
+                    await db.notificacoes.criar('Nova Solicita├º├úo de Cadastro', `${body.nome} (${body.re}) solicitou acesso como ${body.cargo_label}.`, 'aviso');
                 } catch (errNotificacao) {
-                    // O cadastro já foi salvo: falha na notificação não pode reportar erro ao usuário
-                    console.warn('Aviso: cadastro salvo, mas a notificação falhou:', errNotificacao.message);
+                    // O cadastro j├í foi salvo: falha na notifica├º├úo n├úo pode reportar erro ao usu├írio
+                    console.warn('Aviso: cadastro salvo, mas a notifica├º├úo falhou:', errNotificacao.message);
                 }
                 return sendJSON(res, { success: true, usuario: novo }, 201);
             }
@@ -531,7 +531,7 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 const termo = query.termo || '';
                 const usuario = await db.usuarios.buscarPorREouEmail(termo);
                 if (!usuario) {
-                    return sendJSON(res, { error: 'Nenhuma solicitação encontrada com os dados informados.' }, 404);
+                    return sendJSON(res, { error: 'Nenhuma solicita├º├úo encontrada com os dados informados.' }, 404);
                 }
                 return sendJSON(res, {
                     nome: usuario.nome,
@@ -554,21 +554,21 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 const body = await parseBody(req);
                 const atualizado = await db.usuarios.atualizarStatus(id, body.status, body.aprovadoPor, body.motivo);
                 if (!atualizado) {
-                    return sendJSON(res, { error: 'Usuário não encontrado.' }, 404);
+                    return sendJSON(res, { error: 'Usu├írio n├úo encontrado.' }, 404);
                 }
                 return sendJSON(res, atualizado);
             }
 
-            // 8. NOTIFICAÇÕES
+            // 8. NOTIFICA├ç├òES
             if (pathname === '/api/notificacoes' && method === 'GET') {
                 return sendJSON(res, await db.notificacoes.listar());
             }
 
-            return sendJSON(res, { error: 'Endpoint não encontrado' }, 404);
+            return sendJSON(res, { error: 'Endpoint n├úo encontrado' }, 404);
         }
 
         // ====================================================================
-        // SERVIÇO DE ARQUIVOS ESTÁTICOS (HTML, CSS, JS, IMAGENS)
+        // SERVI├çO DE ARQUIVOS EST├üTICOS (HTML, CSS, JS, IMAGENS)
         // ====================================================================
         let safePath = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
         if (safePath === '/' || safePath === '\\') {
@@ -598,51 +598,51 @@ ${JSON.stringify(buscaSemantica, null, 2)}
                 fs.createReadStream(indexPath).pipe(res);
             } else {
                 res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
-                res.end('Página não encontrada.');
+                res.end('P├ígina n├úo encontrada.');
             }
         }
     } catch (err) {
         console.error('Erro no servidor:', err);
         const msg = String((err && err.message) || '');
         if ((err && err.code === '23505') || /UNIQUE constraint failed/i.test(msg)) {
-            return sendJSON(res, { error: 'Já existe um registro com este nome ou código. Use outro.' }, 409);
+            return sendJSON(res, { error: 'J├í existe um registro com este nome ou c├│digo. Use outro.' }, 409);
         }
         if ((err && err.code === '23502') || /NOT NULL constraint failed/i.test(msg)) {
-            return sendJSON(res, { error: 'Preencha todos os campos obrigatórios.' }, 400);
+            return sendJSON(res, { error: 'Preencha todos os campos obrigat├│rios.' }, 400);
         }
         if (err && err.code === '22P02') {
-            return sendJSON(res, { error: 'Algum campo foi preenchido com um formato inválido.' }, 400);
+            return sendJSON(res, { error: 'Algum campo foi preenchido com um formato inv├ílido.' }, 400);
         }
         sendJSON(res, { error: 'Erro interno no servidor', message: err.message }, 500);
     }
 });
 
 // ====================================================================
-// INICIALIZAÇÃO ASSÍNCRONA (PostgreSQL precisa de await)
+// INICIALIZA├ç├âO ASS├ìNCRONA (PostgreSQL precisa de await)
 // ====================================================================
 (async () => {
     try {
         await db.initDatabase();
-        console.log('✅ Banco de dados inicializado com sucesso.');
+        console.log('Ô£à Banco de dados inicializado com sucesso.');
     } catch (err) {
-        console.error('❌ Erro ao inicializar banco:', err);
+        console.error('ÔØî Erro ao inicializar banco:', err);
     }
 
     server.listen(PORT, () => {
         const dbType = db.USE_POSTGRES ? 'PostgreSQL (Supabase)' : 'SQLite local';
         console.log(`
-╔══════════════════════════════════════════════════════════════════╗
-║                   🏗️ ELLENCO CONSTRUÇÕES 2026                   ║
-║             SISTEMA DIGITAL DE APONTAMENTO DE PRODUÇÃO           ║
-║               + ASSISTENTE DE INTELIGÊNCIA ARTIFICIAL            ║
-╠══════════════════════════════════════════════════════════════════╣
-║                                                                  ║
-║  🌐 Servidor Ativo:  http://localhost:${PORT}                       ║
-║  🗄️  Banco de Dados:  ${dbType.padEnd(40)}║
-║  🤖 Agente de IA:    http://localhost:${PORT}/api/chat               ║
-║  ⚡ REST API:        http://localhost:${PORT}/api/status             ║
-║                                                                  ║
-╚══════════════════════════════════════════════════════════════════╝
+ÔòöÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòù
+Ôòæ                   ­ƒÅù´©Å ELLENCO CONSTRU├ç├òES 2026                   Ôòæ
+Ôòæ             SISTEMA DIGITAL DE APONTAMENTO DE PRODU├ç├âO           Ôòæ
+Ôòæ               + ASSISTENTE DE INTELIG├èNCIA ARTIFICIAL            Ôòæ
+ÔòáÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòú
+Ôòæ                                                                  Ôòæ
+Ôòæ  ­ƒîÉ Servidor Ativo:  http://localhost:${PORT}                       Ôòæ
+Ôòæ  ­ƒùä´©Å  Banco de Dados:  ${dbType.padEnd(40)}Ôòæ
+Ôòæ  ­ƒñû Agente de IA:    http://localhost:${PORT}/api/chat               Ôòæ
+Ôòæ  ÔÜí REST API:        http://localhost:${PORT}/api/status             Ôòæ
+Ôòæ                                                                  Ôòæ
+ÔòÜÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòÉÔòØ
         `);
     });
 })();
