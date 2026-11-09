@@ -1,9 +1,10 @@
-/* ==================================================================== */
+﻿/* ==================================================================== */
 /* ELLENCO - HISTORICO.JS                                               */
-/* Controlador da Auditoria, Filtros, Detalhes e Exportações            */
+/* Controlador da Auditoria, Filtros Dinâmicos, Detalhes e Exportações   */
 /* ==================================================================== */
 
 let todosApontamentos = [];
+let listaFiltradaAtual = [];
 
 document.addEventListener("DOMContentLoaded", async () => {
     renderSidebar("historico");
@@ -21,7 +22,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function carregarHistorico() {
     try {
-        todosApontamentos = await api.getApontamentos();
+        const [apontamentos, obras, atividades] = await Promise.all([
+            api.getApontamentos(),
+            api.getObras().catch(() => []),
+            api.getAtividades().catch(() => [])
+        ]);
+
+        todosApontamentos = Array.isArray(apontamentos) ? apontamentos : [];
+
+        // Preenche os selects dinamicamente direto do banco de dados
+        popularFiltrosDinamicos(obras, atividades);
+
         renderizarHistorico();
     } catch (err) {
         console.error("Erro ao carregar histórico:", err);
@@ -29,29 +40,136 @@ async function carregarHistorico() {
     }
 }
 
+/**
+ * Preenche os selects de Obras e Atividades a partir do banco de dados
+ * e de qualquer registro presente nos apontamentos.
+ */
+function popularFiltrosDinamicos(obrasCadastradas = [], atividadesCadastradas = []) {
+    // 1. OBRAS
+    const selectObra = document.getElementById("filtroObraHistorico");
+    if (selectObra) {
+        const valorAtual = selectObra.value || "todas";
+        const conjuntoObras = new Set();
+
+        if (Array.isArray(obrasCadastradas)) {
+            obrasCadastradas.forEach(o => {
+                const nome = (typeof o === "string" ? o : o.nome || "").trim();
+                if (nome) conjuntoObras.add(nome);
+            });
+        }
+        todosApontamentos.forEach(a => {
+            if (a.obra && a.obra.trim()) conjuntoObras.add(a.obra.trim());
+        });
+
+        const obrasOrdenadas = Array.from(conjuntoObras).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+        selectObra.innerHTML = `<option value="todas">Todas as Obras</option>` +
+            obrasOrdenadas.map(o => `<option value="${escaparHtml(o)}">${escaparHtml(o)}</option>`).join("");
+
+        if (conjuntoObras.has(valorAtual)) {
+            selectObra.value = valorAtual;
+        } else {
+            selectObra.value = "todas";
+        }
+    }
+
+    // 2. ATIVIDADES
+    const selectAtiv = document.getElementById("filtroAtividadeHistorico");
+    if (selectAtiv) {
+        const valorAtual = selectAtiv.value || "todas";
+        const conjuntoAtividades = new Set();
+
+        if (Array.isArray(atividadesCadastradas)) {
+            atividadesCadastradas.forEach(a => {
+                const nome = (typeof a === "string" ? a : a.nome || "").trim();
+                if (nome) conjuntoAtividades.add(nome);
+            });
+        }
+        todosApontamentos.forEach(a => {
+            if (a.atividade && a.atividade.trim()) conjuntoAtividades.add(a.atividade.trim());
+        });
+
+        const atividadesOrdenadas = Array.from(conjuntoAtividades).sort((a, b) => a.localeCompare(b, "pt-BR"));
+
+        selectAtiv.innerHTML = `<option value="todas">Todas as Atividades</option>` +
+            atividadesOrdenadas.map(a => `<option value="${escaparHtml(a)}">${escaparHtml(a)}</option>`).join("");
+
+        if (conjuntoAtividades.has(valorAtual)) {
+            selectAtiv.value = valorAtual;
+        } else {
+            selectAtiv.value = "todas";
+        }
+    }
+}
+
+function escaparHtml(texto) {
+    return String(texto).replace(/[&<>"']/g, c => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+    }[c]));
+}
+
 function renderizarHistorico() {
     const filtroTexto = document.getElementById("filtroHistorico")?.value.toLowerCase().trim() || "";
     const filtroStatus = document.getElementById("filtroStatusHistorico")?.value || "todos";
     const filtroObra = document.getElementById("filtroObraHistorico")?.value || "todas";
+    const filtroAtividade = document.getElementById("filtroAtividadeHistorico")?.value || "todas";
+    const filtroDataDe = document.getElementById("filtroDataDeHistorico")?.value || "";
+    const filtroDataAte = document.getElementById("filtroDataAteHistorico")?.value || "";
 
-    let lista = todosApontamentos.filter(i => {
-        const okTexto = (i.equipe || "").toLowerCase().includes(filtroTexto) ||
-                        (i.obra || "").toLowerCase().includes(filtroTexto) ||
-                        (i.atividade || "").toLowerCase().includes(filtroTexto) ||
-                        (i.encarregado || "").toLowerCase().includes(filtroTexto) ||
-                        (i.protocolo || "").toLowerCase().includes(filtroTexto);
+    listaFiltradaAtual = todosApontamentos.filter(i => {
+        // Busca textual livre
+        const okTexto = !filtroTexto ||
+            (i.equipe || "").toLowerCase().includes(filtroTexto) ||
+            (i.obra || "").toLowerCase().includes(filtroTexto) ||
+            (i.atividade || "").toLowerCase().includes(filtroTexto) ||
+            (i.encarregado || "").toLowerCase().includes(filtroTexto) ||
+            (i.protocolo || "").toLowerCase().includes(filtroTexto) ||
+            (i.obs || "").toLowerCase().includes(filtroTexto);
 
-        const okObra = (filtroObra === "todas" || i.obra === filtroObra);
+        // Filtro de Obra
+        const okObra = (filtroObra === "todas" || (i.obra || "").trim() === filtroObra.trim());
 
+        // Filtro de Atividade
+        const okAtividade = (filtroAtividade === "todas" || (i.atividade || "").trim() === filtroAtividade.trim());
+
+        // Filtro de Desempenho / Meta
         let okStatus = true;
         const desv = parseFloat(i.desvio) || 0;
         if (filtroStatus === "acima") okStatus = (desv >= -10);
         else if (filtroStatus === "critico") okStatus = (desv < -10);
 
-        return okTexto && okObra && okStatus;
+        // Filtros de Data
+        let okDataDe = true;
+        let okDataAte = true;
+        if (filtroDataDe) {
+            okDataDe = Boolean(i.data && i.data >= filtroDataDe);
+        }
+        if (filtroDataAte) {
+            okDataAte = Boolean(i.data && i.data <= filtroDataAte);
+        }
+
+        return okTexto && okObra && okAtividade && okStatus && okDataDe && okDataAte;
     });
 
-    renderizarTabelaHistorico(lista);
+    renderizarTabelaHistorico(listaFiltradaAtual);
+}
+
+function limparFiltrosHistorico() {
+    const fTexto = document.getElementById("filtroHistorico");
+    const fStatus = document.getElementById("filtroStatusHistorico");
+    const fObra = document.getElementById("filtroObraHistorico");
+    const fAtiv = document.getElementById("filtroAtividadeHistorico");
+    const fDataDe = document.getElementById("filtroDataDeHistorico");
+    const fDataAte = document.getElementById("filtroDataAteHistorico");
+
+    if (fTexto) fTexto.value = "";
+    if (fStatus) fStatus.value = "todos";
+    if (fObra) fObra.value = "todas";
+    if (fAtiv) fAtiv.value = "todas";
+    if (fDataDe) fDataDe.value = "";
+    if (fDataAte) fDataAte.value = "";
+
+    renderizarHistorico();
 }
 
 function renderizarTabelaHistorico(lista) {
@@ -99,11 +217,11 @@ function renderizarTabelaHistorico(lista) {
                 <td class="text-center">${badgeStatus}</td>
                 <td class="text-center no-print">
                     <div class="flex items-center justify-center gap-1.5">
-                        <button onclick="abrirModalDetalhes(${item.id})" class="p-1.5 rounded-lg text-slate-500 hover:text-ellenco-navy hover:bg-slate-100 transition-colors cursor-pointer" title="Ver Detalhes">
+                        <button onclick="abrirModalDetalhes(${item.id})" class="p-1.5 text-slate-500 hover:text-ellenco-blue hover:bg-slate-100 rounded-lg transition-colors cursor-pointer" title="Ver Detalhes">
                             <i class="fa-solid fa-eye text-xs"></i>
                         </button>
-                        <button onclick="excluirApontamento(${item.id})" class="p-1.5 rounded-lg text-slate-400 hover:text-ellenco-red hover:bg-red-50 transition-colors cursor-pointer" title="Excluir Registro">
-                            <i class="fa-solid fa-trash text-xs"></i>
+                        <button onclick="excluirApontamento(${item.id})" class="p-1.5 text-slate-400 hover:text-ellenco-red hover:bg-red-50 rounded-lg transition-colors cursor-pointer" title="Excluir Registro">
+                            <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                     </div>
                 </td>
@@ -113,14 +231,14 @@ function renderizarTabelaHistorico(lista) {
 }
 
 function abrirModalDetalhes(id) {
-    const item = todosApontamentos.find(i => i.id === id);
+    const item = todosApontamentos.find(i => String(i.id) === String(id));
     if (!item) return;
 
     const modal = document.getElementById("modalDetalhesApontamento");
+    const protocoloElem = document.getElementById("modalDetalheProtocolo");
     const container = document.getElementById("conteudoModalDetalhes");
-    const elProt = document.getElementById("modalDetalheProtocolo");
 
-    if (elProt) elProt.textContent = item.protocolo || `BDP-2026-${item.id}`;
+    if (protocoloElem) protocoloElem.textContent = item.protocolo || `BDP-2026-${item.id}`;
 
     const dataFmt = item.data ? item.data.split("-").reverse().join("/") : "-";
     const desv = parseFloat(item.desvio) || 0;
@@ -175,21 +293,23 @@ async function excluirApontamento(id) {
     if (!confirm("Deseja realmente remover este registro de apontamento da auditoria?")) return;
     try {
         await api.deleteApontamento(id);
-        mostrarToast("Registro removido do banco com sucesso.", "info");
+        mostrarToast("Registro removido com sucesso.", "info");
         await carregarHistorico();
     } catch (e) {
         mostrarToast(e.message || "Erro ao remover registro.", "erro");
     }
 }
 
-// EXPORTAÇÕES EXCEL E PDF
+// EXPORTAÇÕES EXCEL E PDF (Respeitam a seleção filtrada)
 async function exportarExcel() {
-    if (!todosApontamentos.length) {
+    const dadosOrigem = (listaFiltradaAtual && listaFiltradaAtual.length) ? listaFiltradaAtual : todosApontamentos;
+
+    if (!dadosOrigem.length) {
         mostrarToast("Nenhum dado disponível para exportação.", "warning");
         return;
     }
 
-    const dadosExcel = todosApontamentos.map(i => ({
+    const dadosExcel = dadosOrigem.map(i => ({
         Protocolo: i.protocolo || `BDP-${i.id}`,
         Data: i.data,
         Turno: i.turno,
@@ -231,6 +351,7 @@ function exportarPDF() {
 }
 
 window.renderizarHistorico = renderizarHistorico;
+window.limparFiltrosHistorico = limparFiltrosHistorico;
 window.abrirModalDetalhes = abrirModalDetalhes;
 window.fecharModalDetalhes = fecharModalDetalhes;
 window.excluirApontamento = excluirApontamento;
