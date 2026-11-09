@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
@@ -92,12 +92,13 @@
             <form id="formNovaAtividade" onsubmit="salvarNovaAtividade(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Nome da Atividade *</label>
-                    <input id="novaAtividadeNome" required maxlength="80" placeholder="Ex: Compactação de Subleito" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                    <input id="novaAtividadeNome" required maxlength="80" placeholder="Ex: Terraplanagem por Estacas, Compactação..." class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-slate-700 mb-1">Unidade Técnica *</label>
-                    <input id="novaAtividadeUnidade" required maxlength="10" list="listaUnidades" placeholder="Ex: ton, m³, m², m, un" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
+                    <input id="novaAtividadeUnidade" required maxlength="15" list="listaUnidades" placeholder="Ex: estacas, ton, m³, m², m, un" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs outline-none focus:ring-2 focus:ring-ellenco-blue">
                     <datalist id="listaUnidades">
+                        <option value="estacas"></option>
                         <option value="ton"></option>
                         <option value="m³"></option>
                         <option value="m²"></option>
