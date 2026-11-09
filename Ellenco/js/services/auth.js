@@ -1,4 +1,4 @@
-/* ==================================================================== */
+﻿/* ==================================================================== */
 /* ELLENCO - AUTH.JS                                                    */
 /* Gerenciamento de Sessão, Permissões por Cargo & Notificações Toasts */
 /* ==================================================================== */
@@ -35,6 +35,17 @@ function efetuarLogout() {
     }, 400);
 }
 
+function isUsuarioCampo(usuario = getUsuarioLogado()) {
+    if (!usuario) return true;
+    const cargo = String(usuario.cargo || "").toLowerCase().trim();
+    const nivel = Number(usuario.nivel) || 1;
+    return cargo === "operacional" || cargo === "apontador" || cargo === "encarregado" || nivel <= 1;
+}
+
+function isUsuarioEngenhariaOuDiretoria(usuario = getUsuarioLogado()) {
+    return !isUsuarioCampo(usuario);
+}
+
 function verificarAutenticacao() {
     const usuario = getUsuarioLogado();
     const nomeEl = document.getElementById("userNomeLabel");
@@ -46,15 +57,34 @@ function verificarAutenticacao() {
 
 function aplicarPermissoesCargo() {
     const usuario = getUsuarioLogado();
-    const btnAprovacoes = document.querySelectorAll(".menu-item-aprovacoes");
+    const paginaAtual = window.location.pathname.split("/").pop() || "";
 
-    btnAprovacoes.forEach(el => {
-        if (usuario.nivel < 3 && usuario.cargo === "operacional") {
-            el.classList.add("hidden");
-        } else {
-            el.classList.remove("hidden");
-        }
-    });
+    // Páginas restritas para a Engenharia / Diretoria
+    const paginasRestritasCampo = [
+        "historico-auditoria.html",
+        "atividades.html",
+        "equipes-campo.html",
+        "obras-frentes.html",
+        "equipamentos-frota.html",
+        "aprovacoes-usuarios.html"
+    ];
+
+    // Se usuário for do Campo / Apontamento e tentar abrir página restrita via URL direta
+    if (isUsuarioCampo(usuario) && paginasRestritasCampo.includes(paginaAtual)) {
+        mostrarToast("Acesso restrito à Engenharia e Diretoria.", "warning");
+        setTimeout(() => {
+            window.location.href = "novo-apontamento.html";
+        }, 300);
+        return;
+    }
+
+    // Gestão de Acessos é exclusiva para Gestores / Diretoria (nível >= 3)
+    if (paginaAtual === "aprovacoes-usuarios.html" && usuario.nivel < 3 && usuario.cargo !== "gestor") {
+        mostrarToast("Acesso exclusivo para Gestores e Diretoria.", "warning");
+        setTimeout(() => {
+            window.location.href = "dashboard.html";
+        }, 300);
+    }
 }
 
 // 2. SISTEMA GLOBAL DE NOTIFICAÇÕES (TOAST)
@@ -121,6 +151,8 @@ function fecharNotificacoes() {
 window.getUsuarioLogado = getUsuarioLogado;
 window.salvarSessao = salvarSessao;
 window.efetuarLogout = efetuarLogout;
+window.isUsuarioCampo = isUsuarioCampo;
+window.isUsuarioEngenhariaOuDiretoria = isUsuarioEngenhariaOuDiretoria;
 window.verificarAutenticacao = verificarAutenticacao;
 window.aplicarPermissoesCargo = aplicarPermissoesCargo;
 window.mostrarToast = mostrarToast;
