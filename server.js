@@ -22,15 +22,17 @@ try {
     console.warn('Dotenv n├úo carregado, usando vari├íveis de ambiente do sistema.');
 }
 
-// Inicializa cliente Gemini SDK
+// Configuração dos Provedores de IA (DeepSeek / Gemini)
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY || '';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY || '';
 let genAI = null;
 try {
     const { GoogleGenAI } = require('@google/genai');
-    if (process.env.GEMINI_API_KEY) {
-        genAI = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    if (GEMINI_API_KEY) {
+        genAI = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
     }
 } catch (e) {
-    console.warn('GoogleGenAI SDK n├úo inicializado:', e.message);
+    // SDK do Gemini opcional
 }
 
 const PORT = process.env.PORT || 3000;
@@ -83,173 +85,191 @@ function parseBody(req) {
     });
 }
 
+// Função auxiliar para normalizar texto (remove acentos para comparação 100% infalível)
+function normalizarTexto(t) {
+    return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
 /**
- * Motor Anal├¡tico Inteligente de Consulta Local ao SQLite
- * Responde com 100% de fidelidade aos dados reais mesmo se a API externa do Gemini estiver offline.
+ * Motor Analítico Inteligente de Consulta Local ao Banco de Dados (SQLite / PostgreSQL)
+ * Responde com 100% de fidelidade aos dados reais mesmo se as APIs externas de IA estiverem offline.
  */
 async function processarConsultaAnaliticaLocal(mensagem, contexto, historico = []) {
     const msg = mensagem.toLowerCase().trim();
-    const kpis = contexto.kpisGerais;
-    const bdp = contexto.ultimosApontamentos;
-    const obras = contexto.obras;
-    const equipes = contexto.equipes;
-    const frota = contexto.frota;
-    const ocorrencias = contexto.ocorrenciasERecorrencias;
+    const msgNorm = normalizarTexto(mensagem);
 
-    // 1. SOLICITA├ç├âO DE GR├üFICO / DASHBOARD
-    if (msg.includes('gr├ífico') || msg.includes('grafico') || msg.includes('dashboard') || msg.includes('visualiza├º├úo') || msg.includes('curva')) {
-        if (msg.includes('equipe') || msg.includes('desempenho')) {
+    const kpis = contexto.kpisGerais || { totalRegistros: 0, totalMeta: 0, totalRealizado: 0, eficiencia: 0, desvio: 0, acima: 0, naMeta: 0, abaixo: 0, totalHoras: 0, produtividadeMedia: '0' };
+    const bdp = contexto.ultimosApontamentos || [];
+    const obras = contexto.obras || [];
+    const equipes = contexto.equipes || [];
+    const frota = contexto.frota || { total: 0, operacionais: 0, emManutencao: [] };
+    const ocorrencias = contexto.ocorrenciasERecorrencias || [];
+
+    // 0. SAUDAÇÕES E MENSAGENS SOCIAIS (Bom dia, Boa tarde, Olá, etc.)
+    if (msgNorm === 'bom dia' || msgNorm.startsWith('bom dia') ||
+        msgNorm === 'boa tarde' || msgNorm.startsWith('boa tarde') ||
+        msgNorm === 'boa noite' || msgNorm.startsWith('boa noite') ||
+        msgNorm === 'ola' || msgNorm === 'oi' || msgNorm === 'opa' || msgNorm === 'ola!') {
+        const saudacao = msgNorm.includes('tarde') ? 'Boa tarde' : (msgNorm.includes('noite') ? 'Boa noite' : 'Bom dia');
+        return {
+            resposta: `${saudacao}! Sou o **Assistente Inteligente da Ellenco**.\n\nEstou conectado em tempo real aos dados da empresa. Temos **${kpis.totalRegistros} boletins registrados**, com **${obras.length} contratos ativos** e **${equipes.length} equipes de campo** em operação.\n\nComo posso ajudar você hoje?\n- *"Gerar gráfico de produção diária"*\n- *"Qual é a situação das obras?"*\n- *"Como está o desempenho das equipes?"*\n- *"Quais máquinas estão em manutenção?"*`
+        };
+    }
+
+    // 1. SOLICITAÇÃO DE GRÁFICO / DASHBOARD
+    if (msgNorm.includes('grafico') || msgNorm.includes('dashboard') || msgNorm.includes('visualizacao') || msgNorm.includes('curva') || msgNorm.includes('graficos')) {
+        if (msgNorm.includes('equipe') || msgNorm.includes('desempenho')) {
             const labels = equipes.map(e => e.nome);
             const realizados = equipes.map(e => e.realizadoAcumulado);
             return {
-                resposta: `Aqui est├í o gr├ífico comparativo de produ├º├úo acumulada por equipe de campo:\n\n- **Equipes Analisadas**: ${equipes.length} frentes ativas.\n- **Maior Volume**: ${equipes[0]?.nome} com ${equipes[0]?.realizadoAcumulado?.toLocaleString('pt-BR')} unidades.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Produ├º├úo Acumulada por Equipe",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(realizados)},\n  "unidade": "Volume Acumulado"\n}\n\`\`\``
+                resposta: `Aqui está o gráfico comparativo de produção acumulada por equipe de campo:\n\n- **Equipes Analisadas**: ${equipes.length} frentes ativas.\n- **Maior Volume**: ${equipes[0]?.nome || 'Equipe Principal'} com ${Number(equipes[0]?.realizadoAcumulado || 0).toLocaleString('pt-BR')} unidades.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Produção Acumulada por Equipe",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(realizados)},\n  "unidade": "Volume Acumulado"\n}\n\`\`\``
             };
-        } else if (msg.includes('obra') || msg.includes('contrato') || msg.includes('frente')) {
-            const labels = obras.map(o => o.nome.replace('Rodovia ', ''));
-            const progressos = obras.map(o => parseFloat(o.progresso));
+        } else if (msgNorm.includes('obra') || msgNorm.includes('contrato') || msgNorm.includes('frente')) {
+            const labels = obras.map(o => (o.nome || '').replace('Rodovia ', ''));
+            const progressos = obras.map(o => parseFloat(o.progresso) || 0);
             return {
-                resposta: `Aqui est├í o gr├ífico de avan├ºo f├¡sico percentual dos contratos:\n\n- **Total de Contratos**: ${obras.length} frentes ativas.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Avan├ºo F├¡sico dos Contratos (%)",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(progressos)},\n  "unidade": "% Conclu├¡do"\n}\n\`\`\``
+                resposta: `Aqui está o gráfico de avanço físico percentual dos contratos:\n\n- **Total de Contratos**: ${obras.length} frentes ativas.\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Avanço Físico dos Contratos (%)",\n  "labels": ${JSON.stringify(labels)},\n  "valores": ${JSON.stringify(progressos)},\n  "unidade": "% Concluído"\n}\n\`\`\``
             };
         } else {
-            // Curva di├íria de produ├º├úo
+            // Curva diária de produção (Meta vs Realizado)
             const ordenados = [...bdp].reverse();
-            const labels = ordenados.map(a => a.data.split('-').slice(1).join('/'));
-            const planejados = ordenados.map(a => parseFloat(a.planejado));
-            const realizados = ordenados.map(a => parseFloat(a.realizado));
+            const labels = ordenados.map(a => (a.data || '').split('-').slice(1).join('/'));
+            const planejados = ordenados.map(a => parseFloat(a.planejado) || 0);
+            const realizados = ordenados.map(a => parseFloat(a.realizado) || 0);
             return {
-                resposta: `Gerando gr├ífico comparativo de produ├º├úo di├íria (Meta vs Realizado):\n\n- **Total Planejado no Per├¡odo**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Total Realizado no Per├¡odo**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Efici├¬ncia M├®dia**: ${kpis.eficiencia}%\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Meta Planejada vs Produ├º├úo Realizada",\n  "labels": ${JSON.stringify(labels)},\n  "datasets": [\n    {\n      "label": "Meta Programada",\n      "data": ${JSON.stringify(planejados)},\n      "backgroundColor": "#94A3B8"\n    },\n    {\n      "label": "Realizado em Campo",\n      "data": ${JSON.stringify(realizados)},\n      "backgroundColor": "#0A2342"\n    }\n  ]\n}\n\`\`\``
+                resposta: `Gerando gráfico comparativo de produção diária (Meta vs Realizado):\n\n- **Total Planejado no Período**: ${Number(kpis.totalMeta || 0).toLocaleString('pt-BR')} un\n- **Total Realizado no Período**: ${Number(kpis.totalRealizado || 0).toLocaleString('pt-BR')} un\n- **Eficiência Média**: ${kpis.eficiencia || 0}%\n\n\`\`\`json\n{\n  "tipo": "bar",\n  "titulo": "Meta Planejada vs Produção Realizada",\n  "labels": ${JSON.stringify(labels)},\n  "datasets": [\n    {\n      "label": "Meta Programada",\n      "data": ${JSON.stringify(planejados)},\n      "backgroundColor": "#94A3B8"\n    },\n    {\n      "label": "Realizado em Campo",\n      "data": ${JSON.stringify(realizados)},\n      "backgroundColor": "#0A2342"\n    }\n  ]\n}\n\`\`\``
             };
         }
     }
 
-    // 2. ├ÜLTIMOS REGISTROS / ├ÜLTIMO APONTAMENTO
-    if (msg.includes('├║ltimo') || msg.includes('ultimo') || msg.includes('recentes') || msg.includes('novos registros') || msg.includes('novo registro')) {
+    // 2. ÚLTIMOS REGISTROS / ÚLTIMO APONTAMENTO
+    if (msgNorm.includes('ultimo') || msgNorm.includes('recentes') || msgNorm.includes('novos registros') || msgNorm.includes('novo registro')) {
         const ult = bdp[0];
         if (!ult) {
-            return { resposta: "N├úo h├í nenhum apontamento registrado no banco de dados atualmente." };
+            return { resposta: "Não há nenhum apontamento registrado no banco de dados atualmente." };
         }
-        let texto = `­ƒôï **├Ültimo Boletim Di├írio de Produ├º├úo (BDP) Registrado:**\n\n`;
-        texto += `- **Protocolo**: \`${ult.protocolo}\`\n`;
-        texto += `- **Data & Turno**: ${ult.data} (${ult.turno})\n`;
+        let texto = `📋 **Último Boletim Diário de Produção (BDP) Registrado:**\n\n`;
+        texto += `- **Protocolo**: \`${ult.protocolo || 'BDP-' + ult.id}\`\n`;
+        texto += `- **Data & Turno**: ${ult.data} (${ult.turno || 'Diurno'})\n`;
         texto += `- **Obra**: ${ult.obra}\n`;
-        texto += `- **Equipe**: ${ult.equipe} (L├¡der: ${ult.encarregado})\n`;
+        texto += `- **Equipe**: ${ult.equipe} (Líder: ${ult.encarregado})\n`;
         texto += `- **Atividade**: ${ult.atividade}\n`;
         texto += `- **Meta**: ${ult.planejado} | **Realizado**: ${ult.realizado}\n`;
-        texto += `- **Desvio**: **${ult.desvioPercentual}** (Efici├¬ncia: ${ult.eficiencia})\n`;
-        texto += `- **Produtividade**: ${ult.produtividadeHora}\n`;
-        texto += `- **Condi├º├úo Clim├ítica**: ${ult.clima}\n`;
+        texto += `- **Desvio**: **${ult.desvioPercentual || ult.desvio + '%'}** (Eficiência: ${ult.eficiencia}%)\n`;
+        texto += `- **Produtividade**: ${ult.produtividadeHora || ult.produtividade}\n`;
+        texto += `- **Condição Climática**: ${ult.clima || 'Ensolarado'}\n`;
         if (ult.parada && ult.parada !== 'Nenhum') {
-            texto += `- **Ocorr├¬ncia/Parada**: ÔÜá´©Å *${ult.parada}*\n`;
+            texto += `- **Ocorrência/Parada**: ⚠️ *${ult.parada}*\n`;
         }
-        if (ult.observacao) {
-            texto += `- **Observa├º├Áes**: _"${ult.observacao}"_\n`;
+        if (ult.observacao || ult.obs) {
+            texto += `- **Observações**: _"${ult.observacao || ult.obs}"_\n`;
         }
         return { resposta: texto };
     }
 
     // 3. QUANTIDADE DE REGISTROS / CONTAGEM
-    if (msg.includes('quantos registros') || msg.includes('total de registros') || msg.includes('quantidade de registros') || msg.includes('quantos apontamentos')) {
+    if (msgNorm.includes('quantos registros') || msgNorm.includes('total de registros') || msgNorm.includes('quantidade de registros') || msgNorm.includes('quantos apontamentos')) {
         return {
-            resposta: `Atualmente temos **${kpis.totalRegistros} boletins di├írios de produ├º├úo (BDP)** registrados no banco de dados SQLite.\n\n- **Volume Total Planejado**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n- **Volume Total Realizado**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n- **Efici├¬ncia Geral**: ${kpis.eficiencia}%\n- **Desvio Operacional Geral**: ${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%`
+            resposta: `Atualmente temos **${kpis.totalRegistros} boletins diários de produção (BDP)** registrados no banco de dados.\n\n- **Volume Total Planejado**: ${Number(kpis.totalMeta || 0).toLocaleString('pt-BR')} un\n- **Volume Total Realizado**: ${Number(kpis.totalRealizado || 0).toLocaleString('pt-BR')} un\n- **Eficiência Geral**: ${kpis.eficiencia}%\n- **Desvio Operacional Geral**: ${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%`
         };
     }
 
-    // 4. OCORR├èNCIAS / PROBLEMAS / PARADAS
-    if (msg.includes('problema') || msg.includes('ocorrencia') || msg.includes('ocorr├¬ncia') || msg.includes('parada') || msg.includes('paralis') || msg.includes('quebr') || msg.includes('falha') || msg.includes('critico') || msg.includes('cr├¡tico')) {
+    // 4. OCORRÊNCIAS / PROBLEMAS / PARADAS
+    if (msgNorm.includes('problema') || msgNorm.includes('ocorrencia') || msgNorm.includes('parada') || msgNorm.includes('paralis') || msgNorm.includes('quebr') || msgNorm.includes('falha') || msgNorm.includes('critico')) {
         if (!ocorrencias.length) {
-            return { resposta: "N├úo h├í registros de paralisa├º├Áes ou desvios cr├¡ticos recentes no banco de dados. Todas as frentes de produ├º├úo operaram normalmente." };
+            return { resposta: "Não há registros de paralisações ou desvios críticos recentes no banco de dados. Todas as frentes de produção operaram normalmente." };
         }
-        let texto = `ÔÜá´©Å **Ocorr├¬ncias e Paralisa├º├Áes Registradas no Banco:**\n\n`;
+        let texto = `⚠️ **Ocorrências e Paralisações Registradas no Banco:**\n\n`;
         ocorrencias.forEach(o => {
-            texto += `ÔÇó **${o.data} - ${o.obra} (${o.equipe})**:\n`;
+            texto += `• **${o.data} - ${o.obra} (${o.equipe})**:\n`;
             if (o.motivoParada && o.motivoParada !== 'Nenhum') {
                 texto += `  - Motivo: **${o.motivoParada}**\n`;
             }
             if (o.detalhes) {
                 texto += `  - Detalhes: _"${o.detalhes}"_\n`;
             }
-            texto += `  - Varia├º├úo/Desvio: **${o.desvio}**\n\n`;
+            texto += `  - Variação/Desvio: **${o.desvio}**\n\n`;
         });
         return { resposta: texto };
     }
 
-    // 5. EQUIPAMENTOS / FROTA / MANUTEN├ç├âO
-    if (msg.includes('equipamento') || msg.includes('frota') || msg.includes('maquina') || msg.includes('m├íquina') || msg.includes('horimetro') || msg.includes('hor├¡metro') || msg.includes('manuten├º├úo') || msg.includes('manutencao')) {
-        let texto = `­ƒÜ£ **Status da Frota & Maquin├írios (SQLite):**\n\n`;
-        texto += `- **Frota Total**: ${frota.total} m├íquinas cadastradas\n`;
-        texto += `- **Operando em Campo**: ${frota.operando} equipamentos (${Math.round((frota.operando / frota.total) * 100)}% de disponibilidade)\n`;
-        if (frota.emManutencao.length) {
-            texto += `- **Em Manuten├º├úo**: ${frota.emManutencao.length} m├íquina(s):\n`;
+    // 5. EQUIPAMENTOS / FROTA / MANUTENÇÃO
+    if (msgNorm.includes('equipamento') || msgNorm.includes('frota') || msgNorm.includes('maquina') || msgNorm.includes('caminhao') || msgNorm.includes('rolo') || msgNorm.includes('vibro') || msgNorm.includes('escavadeira') || msgNorm.includes('trator') || msgNorm.includes('manutencao')) {
+        let texto = `🚜 **Status da Frota de Equipamentos:**\n\n`;
+        texto += `- **Frota Total**: ${frota.total || 0} equipamentos cadastrados.\n`;
+        texto += `- **Operacionais**: ${frota.operacionais || 0} equipamentos ativos em campo.\n`;
+        if (frota.emManutencao && frota.emManutencao.length) {
+            texto += `- **Em Manutenção**: ${frota.emManutencao.length} máquina(s):\n`;
             frota.emManutencao.forEach(m => {
-                texto += `  ÔÇó ­ƒöº ${m}\n`;
+                texto += `  • 🔧 ${m}\n`;
             });
         } else {
-            texto += `- **Em Manuten├º├úo**: Nenhuma m├íquina parada no momento.\n`;
+            texto += `- **Em Manutenção**: Nenhuma máquina parada no momento.\n`;
         }
         return { resposta: texto };
     }
 
     // 6. EQUIPES / PRODUTIVIDADE / DESEMPENHO
-    if (msg.includes('equipe') || msg.includes('l├¡der') || msg.includes('lider') || msg.includes('encarregado') || msg.includes('efetivo')) {
-        let texto = `­ƒæÑ **Desempenho das Equipes de Campo:**\n\n`;
+    if (msgNorm.includes('equipe') || msgNorm.includes('lider') || msgNorm.includes('encarregado') || msgNorm.includes('efetivo')) {
+        let texto = `👥 **Desempenho das Equipes de Campo:**\n\n`;
         equipes.forEach(eq => {
-            texto += `ÔÇó **${eq.nome}** (L├¡der: ${eq.lider})\n`;
+            texto += `• **${eq.nome}** (Líder: ${eq.lider || eq.encarregado})\n`;
             texto += `  - Atividade: ${eq.atividade} | Obra: ${eq.obra}\n`;
             texto += `  - Efetivo: ${eq.integrantes} colaboradores | Status: **${eq.status}**\n`;
-            texto += `  - Acumulado: ${eq.realizadoAcumulado?.toLocaleString('pt-BR')} de ${eq.metaAcumulada?.toLocaleString('pt-BR')} programadas\n\n`;
+            texto += `  - Acumulado: ${Number(eq.realizadoAcumulado || 0).toLocaleString('pt-BR')} de ${Number(eq.metaAcumulada || 0).toLocaleString('pt-BR')} programadas\n\n`;
         });
         return { resposta: texto };
     }
 
     // 7. OBRAS / CONTRATOS / FRENTES
-    if (msg.includes('obra') || msg.includes('contrato') || msg.includes('frente') || msg.includes('rodovia') || msg.includes('raposo') || msg.includes('aeroporto') || msg.includes('industrial') || msg.includes('jardim')) {
-        let texto = `­ƒÅù´©Å **Acompanhamento de Obras & Contratos:**\n\n`;
+    if (msgNorm.includes('obra') || msgNorm.includes('contrato') || msgNorm.includes('frente') || msgNorm.includes('rodovia') || msgNorm.includes('raposo') || msgNorm.includes('aeroporto') || msgNorm.includes('industrial') || msgNorm.includes('jardim')) {
+        let texto = `🏗️ **Acompanhamento de Obras & Contratos:**\n\n`;
         obras.forEach(ob => {
-            texto += `ÔÇó **${ob.nome}**\n`;
+            texto += `• **${ob.nome}**\n`;
             texto += `  - Local: ${ob.local}\n`;
-            texto += `  - Respons├ível: ${ob.responsavel}\n`;
-            texto += `  - Avan├ºo F├¡sico: **${ob.progresso}** (${ob.status})\n`;
-            texto += `  - Volume Contratado: ${ob.volume}\n\n`;
+            texto += `  - Responsável: ${ob.responsavel || ob.eng}\n`;
+            texto += `  - Avanço Físico: **${ob.progresso}%** (${ob.status})\n`;
+            texto += `  - Volume Contratado: ${ob.volume || ob.volume_total}\n\n`;
         });
         return { resposta: texto };
     }
 
-    // 8. KPIS GERAIS / RESUMO DA PRODU├ç├âO / INDICADORES
-    if (msg.includes('kpi') || msg.includes('indicador') || msg.includes('eficiencia') || msg.includes('efici├¬ncia') || msg.includes('desvio') || msg.includes('resumo') || msg.includes('hoje') || msg.includes('produ├º├úo') || msg.includes('producao')) {
-        let texto = `­ƒôè **Resumo Consolidado de Produ├º├úo (Base SQLite):**\n\n`;
-        texto += `- **Meta Programada**: ${kpis.totalMeta.toLocaleString('pt-BR')} un\n`;
-        texto += `- **Produ├º├úo Realizada**: ${kpis.totalRealizado.toLocaleString('pt-BR')} un\n`;
-        texto += `- **Efici├¬ncia Geral**: **${kpis.eficiencia}%**\n`;
+    // 8. KPIS GERAIS / RESUMO DA PRODUÇÃO / INDICADORES
+    if (msgNorm.includes('kpi') || msgNorm.includes('indicador') || msgNorm.includes('eficiencia') || msgNorm.includes('desvio') || msgNorm.includes('resumo') || msgNorm.includes('hoje') || msgNorm.includes('producao')) {
+        let texto = `📊 **Resumo Consolidado de Produção:**\n\n`;
+        texto += `- **Meta Programada**: ${Number(kpis.totalMeta || 0).toLocaleString('pt-BR')} un\n`;
+        texto += `- **Produção Realizada**: ${Number(kpis.totalRealizado || 0).toLocaleString('pt-BR')} un\n`;
+        texto += `- **Eficiência Geral**: **${kpis.eficiencia}%**\n`;
         texto += `- **Desvio Operacional**: **${parseFloat(kpis.desvio) >= 0 ? '+' : ''}${kpis.desvio}%**\n`;
-        texto += `- **Produtividade M├®dia**: ${kpis.produtividadeMedia} /h\n`;
+        texto += `- **Produtividade Média**: ${kpis.produtividadeMedia} /h\n`;
         texto += `- **Horas Totais Apontadas**: ${kpis.totalHoras} h\n`;
         texto += `- **Desempenho**: ${kpis.acima} equipes acima da meta, ${kpis.naMeta} na meta, ${kpis.abaixo} abaixo.\n`;
         return { resposta: texto };
     }
 
-    // 8.5. BUSCA ESPEC├ìFICA / SEM├éNTICA EM REGISTROS
+    // 8.5. BUSCA ESPECÍFICA / SEMÂNTICA EM REGISTROS
     const registrosEncontrados = await db.apontamentos.buscarSemantico(mensagem);
     if (registrosEncontrados && registrosEncontrados.length > 0) {
-        let texto = `­ƒöÄ **Localizei ${registrosEncontrados.length} registro(s) no banco de dados relacionado(s) ├á sua consulta:**\n\n`;
+        let texto = `🔎 **Localizei ${registrosEncontrados.length} registro(s) no banco de dados relacionado(s) à sua consulta:**\n\n`;
         registrosEncontrados.forEach(r => {
-            texto += `ÔÇó **Protocolo \`${r.protocolo || 'BDP-' + r.id}\`** (${r.data} - ${r.obra}):\n`;
+            texto += `• **Protocolo \`${r.protocolo || 'BDP-' + r.id}\`** (${r.data} - ${r.obra}):\n`;
             texto += `  - Equipe: **${r.equipe}** (${r.encarregado})\n`;
             texto += `  - Atividade: ${r.atividade}\n`;
             texto += `  - Realizado: **${r.realizado} ${r.unidade}** (Meta: ${r.planejado} ${r.unidade}, Desvio: **${r.desvio}%**)\n`;
             if (r.parada && r.parada !== 'Nenhum') {
-                texto += `  - Ocorr├¬ncia/Parada: ÔÜá´©Å **${r.parada}**\n`;
+                texto += `  - Ocorrência/Parada: ⚠️ **${r.parada}**\n`;
             }
             if (r.obs) {
-                texto += `  - Observa├º├Áes: _"${r.obs}"_\n`;
+                texto += `  - Observações: _"${r.obs}"_\n`;
             }
             texto += `\n`;
         });
         return { resposta: texto.trim() };
     }
 
-    // 9. RESPOSTA PADR├âO INTELIGENTE
+    // 9. RESPOSTA PADRÃO INTELIGENTE
     return {
-        resposta: `Sou o **Assistente Inteligente da Ellenco**, conectado em tempo real ao banco de dados SQLite.\n\nAtualmente temos **${kpis.totalRegistros} boletins de produ├º├úo** registrados, com **${kpis.totalRealizado.toLocaleString('pt-BR')} unidades produzidas** (${kpis.eficiencia}% de efici├¬ncia global) em **${obras.length} contratos ativos**.\n\nVoc├¬ pode me perguntar sobre:\n- *\"Quais foram os ├║ltimos apontamentos?\"*\n- *\"Existe algum equipamento em manuten├º├úo?\"*\n- *\"Quais ocorr├¬ncias ou paradas foram relatadas?\"*\n- *\"Qual ├® o avan├ºo f├¡sico das obras?\"*\n- *\"Gerar gr├ífico de produ├º├úo di├íria\"*`
+        resposta: `Sou o **Assistente Inteligente da Ellenco**, conectado em tempo real ao banco de dados.\n\nAtualmente temos **${kpis.totalRegistros} boletins de produção** registrados, com **${Number(kpis.totalRealizado || 0).toLocaleString('pt-BR')} unidades produzidas** (${kpis.eficiencia}% de eficiência global) em **${obras.length} contratos ativos**.\n\nVocê pode me perguntar sobre:\n- *\"Quais foram os últimos apontamentos?\"*\n- *\"Existe algum equipamento em manutenção?\"*\n- *\"Quais ocorrências ou paradas foram relatadas?\"*\n- *\"Qual é o avanço físico das obras?\"*\n- *\"Gerar gráfico de produção diária\"*`
     };
 }
 
@@ -295,51 +315,95 @@ const server = http.createServer(async (req, res) => {
                 const contextoCompleto = await db.obterContextoParaIA(usuarioLogado);
                 const buscaSemantica = await db.apontamentos.buscarSemantico(mensagem);
 
-                // 2. Tenta processar via Google GenAI (Gemini) se dispon├¡vel
-                if (genAI && process.env.GEMINI_API_KEY) {
-                    try {
-                        const promptSistema = `
-Voc├¬ ├® o Assistente Inteligente Oficial da plataforma Ellenco Constru├º├Áes e Pavimenta├º├úo.
-Sua fun├º├úo ├® ajudar os colaboradores e gestores a compreender, consultar e analisar as informa├º├Áes operacionais de campo.
+                const promptSistema = `Você é o Assistente Inteligente Oficial da plataforma Ellenco Construções e Pavimentação.
+Sua função é ajudar os colaboradores e gestores a compreender, consultar e analisar as informações operacionais de campo.
 
 REGRAS DE CONFIABILIDADE:
-- Voc├¬ possui acesso direto aos dados reais da empresa fornecidos abaixo.
-- NUNCA invente n├║meros, datas, obras, equipes ou registros fict├¡cios.
-- Sempre responda em portugu├¬s brasileiro de forma direta, clara e profissional.
-- Se o usu├írio pedir gr├íficos, gere um bloco com formato JSON contendo {"tipo": "bar"|"doughnut", "titulo": "...", "labels": [...], "valores": [...]} para que a interface renderize o Chart.js.
+- Você possui acesso direto aos dados reais da empresa fornecidos abaixo.
+- NUNCA invente números, datas, obras, equipes ou registros fictícios.
+- Sempre responda em português brasileiro de forma direta, clara e profissional.
+- Se o usuário pedir gráficos, gere um bloco com formato JSON contendo {"tipo": "bar"|"doughnut", "titulo": "...", "labels": [...], "valores": [...]} para que a interface renderize o Chart.js.
 
-SNAPSHOT EM TEMPO REAL DO BANCO DE DADOS SQLITE (ELLENCO):
+SNAPSHOT EM TEMPO REAL DO BANCO DE DADOS (ELLENCO):
 ${JSON.stringify(contextoCompleto, null, 2)}
 
 REGISTROS RELEVANTES ENCONTRADOS PARA A CONSULTA:
-${JSON.stringify(buscaSemantica, null, 2)}
-`;
+${JSON.stringify(buscaSemantica, null, 2)}`;
 
-                        const response = await genAI.models.generateContent({
-                            model: 'gemini-3.8-flash',
-                            contents: mensagem,
-                            config: {
-                                systemInstruction: promptSistema
-                            }
+                // 2a. Tenta DeepSeek se DEEPSEEK_API_KEY estiver configurada
+                const deepseekKey = (process.env.DEEPSEEK_API_KEY || '').trim();
+                if (deepseekKey) {
+                    try {
+                        const resDeep = await fetch('https://api.deepseek.com/chat/completions', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${deepseekKey}`
+                            },
+                            body: JSON.stringify({
+                                model: 'deepseek-chat',
+                                messages: [
+                                    { role: 'system', content: promptSistema },
+                                    { role: 'user', content: mensagem }
+                                ],
+                                temperature: 0.3
+                            })
                         });
+
+                        if (resDeep.ok) {
+                            const dataDeep = await resDeep.json();
+                            const textoIA = dataDeep.choices && dataDeep.choices[0] && dataDeep.choices[0].message && dataDeep.choices[0].message.content;
+                            if (textoIA) {
+                                return sendJSON(res, {
+                                    resposta: textoIA,
+                                    fonte: 'DeepSeek-V3 + ' + (db.USE_POSTGRES ? 'PostgreSQL' : 'SQLite'),
+                                    timestamp: new Date().toISOString()
+                                });
+                            }
+                        } else {
+                            const erroTxt = await resDeep.text();
+                            console.warn('DeepSeek retornou status', resDeep.status, erroTxt);
+                        }
+                    } catch (deepseekErr) {
+                        console.warn('Fallback DeepSeek:', deepseekErr.message);
+                    }
+                }
+
+                // 2b. Tenta Gemini com modelos válidos (gemini-2.0-flash ou gemini-1.5-flash)
+                if (genAI && process.env.GEMINI_API_KEY) {
+                    try {
+                        let response = null;
+                        try {
+                            response = await genAI.models.generateContent({
+                                model: 'gemini-2.0-flash',
+                                contents: mensagem,
+                                config: { systemInstruction: promptSistema }
+                            });
+                        } catch (eG1) {
+                            response = await genAI.models.generateContent({
+                                model: 'gemini-1.5-flash',
+                                contents: mensagem,
+                                config: { systemInstruction: promptSistema }
+                            });
+                        }
 
                         if (response && response.text) {
                             return sendJSON(res, {
                                 resposta: response.text,
-                                fonte: 'gemini-3.8-flash + PostgreSQL',
+                                fonte: 'Gemini Flash + ' + (db.USE_POSTGRES ? 'PostgreSQL' : 'SQLite'),
                                 timestamp: new Date().toISOString()
                             });
                         }
                     } catch (genAiError) {
-                        console.warn('Fallback para motor anal├¡tico local devido a:', genAiError.message);
+                        console.warn('Fallback Gemini falhou:', genAiError.message);
                     }
                 }
 
-                // 3. Motor Anal├¡tico Local Nativo (100% Determin├¡stico, baseado nos dados reais do SQLite)
+                // 3. Motor Analítico Local Nativo (Fallback definitivo e 100% determinístico)
                 const resultadoLocal = await processarConsultaAnaliticaLocal(mensagem, contextoCompleto, historico);
                 return sendJSON(res, {
                     resposta: resultadoLocal.resposta,
-                    fonte: 'Motor Anal├¡tico Ellenco (SQLite)',
+                    fonte: 'Motor Analítico Ellenco (' + (db.USE_POSTGRES ? 'PostgreSQL' : 'SQLite') + ')',
                     timestamp: new Date().toISOString()
                 });
             }
@@ -646,4 +710,3 @@ ${JSON.stringify(buscaSemantica, null, 2)}
         `);
     });
 })();
-
