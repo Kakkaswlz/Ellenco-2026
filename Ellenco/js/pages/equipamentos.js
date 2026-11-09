@@ -71,13 +71,13 @@ function renderizarTabelaEquipamentos(lista) {
 
         return `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="font-mono font-black text-slate-900 text-xs">${eq.codigo}</td>
-                <td class="font-bold text-slate-800 text-xs">${eq.tipo}</td>
-                <td class="text-slate-600 text-xs">${eq.modelo}</td>
+                <td class="font-mono font-black text-slate-900 text-xs">${escapeHTML(eq.codigo)}</td>
+                <td class="font-bold text-slate-800 text-xs">${escapeHTML(eq.tipo)}</td>
+                <td class="text-slate-600 text-xs">${escapeHTML(eq.modelo)}</td>
                 <td class="text-right font-mono font-black text-slate-900 text-xs">${horimetro.toLocaleString("pt-BR", { minimumFractionDigits: 1 })} h</td>
-                <td class="text-right font-mono font-bold text-slate-600 text-xs">${consumo}</td>
-                <td class="text-slate-700 text-xs">${eq.local}</td>
-                <td class="text-slate-500 text-xs">${revisao}</td>
+                <td class="text-right font-mono font-bold text-slate-600 text-xs">${escapeHTML(consumo)}</td>
+                <td class="text-slate-700 text-xs">${escapeHTML(eq.local)}</td>
+                <td class="text-slate-500 text-xs">${escapeHTML(revisao)}</td>
                 <td class="text-center">${badgeStatus}</td>
             </tr>
         `;

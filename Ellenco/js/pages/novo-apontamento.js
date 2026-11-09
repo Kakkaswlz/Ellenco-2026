@@ -66,6 +66,12 @@ function adicionarOpcaoSeNaoExiste(nome, unidade) {
     return existente || adicionarOpcaoAtividade(nome, unidade);
 }
 
+function dataHojeLocal() {
+    const agora = new Date();
+    agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+    return agora.toISOString().slice(0, 10);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     renderSidebar("apontamento");
     renderTopbar("Novo Apontamento", "Registro diário com validação imediata e gravação no banco", false);
@@ -75,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Data padrão: hoje
     const inputData = document.getElementById("data");
     if (inputData) {
-        inputData.value = new Date().toISOString().split("T")[0];
+        inputData.value = dataHojeLocal();
     }
 
     carregarAtividadesPersonalizadas();
@@ -229,9 +235,9 @@ async function puxarClimaParaFormulario() {
 }
 
 function gerarNovoProtocolo() {
-    const num = Math.floor(1000 + Math.random() * 9000);
+    const num = crypto.randomUUID().slice(0, 8).toUpperCase();
     const el = document.getElementById("protocoloNumero");
-    if (el) el.textContent = `BDP-2026-${num}`;
+    if (el) el.textContent = `BDP-${new Date().getFullYear()}-${num}`;
 }
 
 async function registrarApontamento(e) {
@@ -251,7 +257,7 @@ async function registrarApontamento(e) {
         return;
     }
 
-    const protocolo = document.getElementById("protocoloNumero")?.textContent || `BDP-2026-${Math.floor(1000 + Math.random() * 9000)}`;
+    const protocolo = document.getElementById("protocoloNumero")?.textContent || `BDP-${new Date().getFullYear()}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
 
     const dados = {
         protocolo,
@@ -296,7 +302,7 @@ function limparFormulario() {
     document.getElementById("formApontamento")?.reset();
     const inputData = document.getElementById("data");
     if (inputData) {
-        inputData.value = new Date().toISOString().split("T")[0];
+        inputData.value = dataHojeLocal();
     }
     alterarUnidade();
     calcularDesvio();

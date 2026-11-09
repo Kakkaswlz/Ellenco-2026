@@ -213,14 +213,21 @@ const DADOS_INICIAIS_EQUIPAMENTOS = [
 ];
 
 let servidorOnline = null;
+let servidorVerificadoEm = 0;
+
+function fetchAPI(url, options = {}) {
+    return fetch(url, { ...options, credentials: "include" });
+}
 
 async function testarServidor() {
-    if (servidorOnline !== null) return servidorOnline;
+    if (servidorOnline !== null && Date.now() - servidorVerificadoEm < 5000) return servidorOnline;
     try {
-        const res = await fetch(`${API_BASE_URL}/status`, { signal: AbortSignal.timeout(1500) });
+        const res = await fetchAPI(`${API_BASE_URL}/status`, { signal: AbortSignal.timeout(1500) });
         servidorOnline = res.ok;
+        servidorVerificadoEm = Date.now();
     } catch (e) {
         servidorOnline = false;
+        servidorVerificadoEm = Date.now();
     }
     return servidorOnline;
 }
@@ -230,7 +237,7 @@ async function testarServidor() {
 async function enviar(caminho, metodo, corpo) {
     let res;
     try {
-        res = await fetch(`${API_BASE_URL}${caminho}`, {
+        res = await fetchAPI(`${API_BASE_URL}${caminho}`, {
             method: metodo,
             headers: { 'Content-Type': 'application/json' },
             body: corpo !== undefined ? JSON.stringify(corpo) : undefined
@@ -269,7 +276,7 @@ const api = {
                 const params = new URLSearchParams();
                 if (filtros.obra && filtros.obra !== 'todas') params.append('obra', filtros.obra);
                 if (filtros.equipe && filtros.equipe !== 'todas') params.append('equipe', filtros.equipe);
-                const res = await fetch(`${API_BASE_URL}/apontamentos?${params.toString()}`);
+                const res = await fetchAPI(`${API_BASE_URL}/apontamentos?${params.toString()}`);
                 if (res.ok) return await res.json();
             } catch (e) {
                 console.warn("Falha na API, usando base local:", e);
@@ -328,7 +335,7 @@ const api = {
             try {
                 const params = new URLSearchParams();
                 if (filtros.obra && filtros.obra !== 'todas') params.append('obra', filtros.obra);
-                const res = await fetch(`${API_BASE_URL}/kpis?${params.toString()}`);
+                const res = await fetchAPI(`${API_BASE_URL}/kpis?${params.toString()}`);
                 if (res.ok) return await res.json();
             } catch (e) {
                 console.warn("Falha no getKPIs da API:", e);
@@ -372,7 +379,7 @@ const api = {
     async getObras() {
         if (await testarServidor()) {
             try {
-                const res = await fetch(`${API_BASE_URL}/obras`);
+                const res = await fetchAPI(`${API_BASE_URL}/obras`);
                 if (res.ok) return await res.json();
             } catch (e) {}
         }
@@ -396,7 +403,7 @@ const api = {
     async getEquipes() {
         if (await testarServidor()) {
             try {
-                const res = await fetch(`${API_BASE_URL}/equipes`);
+                const res = await fetchAPI(`${API_BASE_URL}/equipes`);
                 if (res.ok) return await res.json();
             } catch (e) {}
         }
@@ -420,7 +427,7 @@ const api = {
     async getAtividades() {
         if (await testarServidor()) {
             try {
-                const res = await fetch(`${API_BASE_URL}/atividades`);
+                const res = await fetchAPI(`${API_BASE_URL}/atividades`);
                 if (res.ok) return await res.json();
             } catch (e) {}
         }
@@ -440,7 +447,7 @@ const api = {
     async getEquipamentos() {
         if (await testarServidor()) {
             try {
-                const res = await fetch(`${API_BASE_URL}/equipamentos`);
+                const res = await fetchAPI(`${API_BASE_URL}/equipamentos`);
                 if (res.ok) return await res.json();
             } catch (e) {}
         }
@@ -463,7 +470,7 @@ const api = {
     // ==========================================
     async loginUsuario(termo, senha) {
         if (await testarServidor()) {
-            const res = await fetch(`${API_BASE_URL}/auth/login`, {
+            const res = await fetchAPI(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ re: termo, email: termo, senha })
@@ -473,16 +480,25 @@ const api = {
             return data.usuario;
         }
 
-        // Fallback local
+        // Offline demo accounts remain available only when the API is unreachable.
+        if (senha !== "123") throw new Error("Credenciais inválidas.");
         if (termo.toLowerCase().includes("carlos") || termo.includes("8842")) {
             return { nome: "Carlos Silva", re: "RE-8842", cargo: "operacional", cargoLabel: "Encarregado de Equipe", obra: "SP-270 Rodovia Raposo Tavares", nivel: 1 };
         }
-        return { nome: "Eng. Ricardo Viana", re: "RE-1005", cargo: "gestor", cargoLabel: "Diretor de Operações", obra: "Matriz / Todas as Obras", nivel: 4 };
+        if (termo.toLowerCase().includes("gabriel") || termo.includes("3021")) {
+            return { nome: "Eng. Gabriel Martins", re: "RE-3021", cargo: "engenheiro", cargoLabel: "Engenheiro de Produção", obra: "SP-270 Rodovia Raposo Tavares", nivel: 3 };
+        }
+        if (termo.toLowerCase().includes("ricardo") || termo.includes("1005")) {
+            return { nome: "Eng. Ricardo Viana", re: "RE-1005", cargo: "gestor", cargoLabel: "Diretor de Operações", obra: "Matriz / Todas as Obras", nivel: 4 };
+        }
+        throw new Error("Credenciais inválidas.");
     },
-
+    async logoutUsuario() {
+        if (await testarServidor()) await fetchAPI(`${API_BASE_URL}/auth/logout`, { method: "POST" });
+    },
     async cadastrarUsuario(dados) {
         if (await testarServidor()) {
-            const res = await fetch(`${API_BASE_URL}/auth/register`, {
+            const res = await fetchAPI(`${API_BASE_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(dados)
@@ -496,7 +512,7 @@ const api = {
 
     async consultarStatusUsuario(termo) {
         if (await testarServidor()) {
-            const res = await fetch(`${API_BASE_URL}/auth/status?termo=${encodeURIComponent(termo)}`);
+            const res = await fetchAPI(`${API_BASE_URL}/auth/status?termo=${encodeURIComponent(termo)}`);
             const data = await res.json();
             if (!res.ok) throw new Error(data.error || "Nenhuma solicitação encontrada");
             return data;
@@ -513,7 +529,7 @@ const api = {
 
     async getUsuarios() {
         if (await testarServidor()) {
-            const res = await fetch(`${API_BASE_URL}/auth/usuarios`);
+            const res = await fetchAPI(`${API_BASE_URL}/auth/usuarios`);
             if (res.ok) return await res.json();
         }
         return [];
@@ -542,7 +558,7 @@ const api = {
 
         try {
             const urlClima = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&daily=precipitation_probability_max&timezone=America%2FSao_Paulo`;
-            const res = await fetch(urlClima);
+            const res = await fetch(urlClima, { signal: AbortSignal.timeout(10000) });
             if (!res.ok) throw new Error("Erro na API Meteorológica");
             const data = await res.json();
 

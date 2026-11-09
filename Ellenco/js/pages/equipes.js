@@ -55,15 +55,15 @@ function renderizarGridEquipes(equipes) {
                     <div class="flex justify-between items-start">
                         <div>
                             <span class="text-[10px] font-bold uppercase text-slate-400">Equipe de Produção</span>
-                            <h3 class="font-extrabold text-slate-900 text-base mt-0.5">${eq.nome}</h3>
+                            <h3 class="font-extrabold text-slate-900 text-base mt-0.5">${escapeHTML(eq.nome)}</h3>
                         </div>
                         ${badgeStatus}
                     </div>
 
                     <div class="mt-3.5 space-y-2 text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <p class="flex items-center gap-2"><i class="fa-solid fa-hard-hat text-amber-500 w-4 text-center"></i> <strong>Líder:</strong> <span class="text-slate-800">${eq.encarregado}</span></p>
-                        <p class="flex items-center gap-2"><i class="fa-solid fa-industry text-blue-600 w-4 text-center"></i> <strong>Atividade:</strong> <span class="text-slate-800">${eq.atividade}</span></p>
-                        <p class="flex items-center gap-2"><i class="fa-solid fa-road text-slate-400 w-4 text-center"></i> <strong>Obra:</strong> <span class="text-slate-800 truncate">${eq.obra}</span></p>
+                        <p class="flex items-center gap-2"><i class="fa-solid fa-hard-hat text-amber-500 w-4 text-center"></i> <strong>Líder:</strong> <span class="text-slate-800">${escapeHTML(eq.encarregado)}</span></p>
+                        <p class="flex items-center gap-2"><i class="fa-solid fa-industry text-blue-600 w-4 text-center"></i> <strong>Atividade:</strong> <span class="text-slate-800">${escapeHTML(eq.atividade)}</span></p>
+                        <p class="flex items-center gap-2"><i class="fa-solid fa-road text-slate-400 w-4 text-center"></i> <strong>Obra:</strong> <span class="text-slate-800 truncate">${escapeHTML(eq.obra)}</span></p>
                         <p class="flex items-center gap-2"><i class="fa-solid fa-users text-teal-600 w-4 text-center"></i> <strong>Efetivo:</strong> <span class="text-slate-800">${eq.integrantes} colaboradores</span></p>
                     </div>
                 </div>

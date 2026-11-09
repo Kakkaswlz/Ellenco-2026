@@ -16,10 +16,10 @@ npm start
 # ou
 node server.js
 ```
-Acesse: `http://localhost:3000/HTML/index.html`
+Acesse: `http://localhost:3000/HTML/index.html`. Crie `.env` a partir de `.env.example`; em produção, defina `SESSION_SECRET` com valor aleatório e longo. Não compartilhe as chaves de API.
 
 ### Opção 3: Execução Estática Direta
-Abra o arquivo `Ellenco/HTML/index.html` diretamente no seu navegador. O sistema funcionará com sincronização local inteligente.
+Para usar o modo de demonstração sem banco, abra `Ellenco/HTML/index.html`. Nesse modo, os dados ficam apenas no navegador e o chatbot exige o servidor; para avaliar todos os fluxos, use `npm start` e acesse `http://localhost:3000`.
 
 ---
 

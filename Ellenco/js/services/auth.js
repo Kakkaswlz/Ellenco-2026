@@ -1,8 +1,11 @@
-﻿/* ==================================================================== */
+/* ==================================================================== */
 /* ELLENCO - AUTH.JS                                                    */
 /* Gerenciamento de Sessão, Permissões por Cargo & Notificações Toasts */
 /* ==================================================================== */
 
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+}
 // 1. GESTÃO DE SESSÃO DO USUÁRIO
 function getUsuarioLogado() {
     const sessao = localStorage.getItem("ellenco_usuario_sessao");
@@ -28,6 +31,7 @@ function salvarSessao(usuario) {
 }
 
 function efetuarLogout() {
+    api.logoutUsuario?.().catch(() => {});
     localStorage.removeItem("ellenco_usuario_sessao");
     mostrarToast("Sessão finalizada com sucesso.", "info");
     setTimeout(() => {
@@ -47,6 +51,10 @@ function isUsuarioEngenhariaOuDiretoria(usuario = getUsuarioLogado()) {
 }
 
 function verificarAutenticacao() {
+    if (!localStorage.getItem("ellenco_usuario_sessao")) {
+        window.location.replace("index.html");
+        return;
+    }
     const usuario = getUsuarioLogado();
     const nomeEl = document.getElementById("userNomeLabel");
     const cargoEl = document.getElementById("userCargoLabel");
@@ -120,7 +128,7 @@ function mostrarToast(mensagem, tipo = "info") {
     };
 
     toast.className = `flex items-center gap-3 px-4 py-3 rounded-xl border shadow-xl text-xs font-bold animate-fade-in-up transition-all duration-300 pointer-events-auto ${cores[tipo] || cores.info}`;
-    toast.innerHTML = `<i class="${icones[tipo] || icones.info} text-base shrink-0"></i> <span class="leading-tight">${mensagem}</span>`;
+    toast.innerHTML = `<i class="${icones[tipo] || icones.info} text-base shrink-0"></i> <span class="leading-tight">${escapeHTML(mensagem)}</span>`;
 
     container.appendChild(toast);
 
@@ -148,6 +156,7 @@ function fecharNotificacoes() {
     }
 }
 
+window.escapeHTML = escapeHTML;
 window.getUsuarioLogado = getUsuarioLogado;
 window.salvarSessao = salvarSessao;
 window.efetuarLogout = efetuarLogout;

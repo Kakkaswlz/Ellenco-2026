@@ -68,25 +68,25 @@ function renderizarTabelaUsuarios(lista) {
         if (u.status === 'pendente') {
             botoesAcao = `
                 <div class="flex items-center justify-center gap-1.5">
-                    <button onclick="aprovarUsuario(${u.id}, '${u.nome}')" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors cursor-pointer" title="Aprovar Acesso">
+                    <button onclick="aprovarUsuario(${u.id}, this.dataset.nome)" data-nome="${escapeHTML(u.nome)}" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition-colors cursor-pointer" title="Aprovar Acesso">
                         <i class="fa-solid fa-check mr-1"></i> Aprovar
                     </button>
-                    <button onclick="rejeitarUsuario(${u.id}, '${u.nome}')" class="px-2.5 py-1 rounded-lg bg-red-100 hover:bg-red-200 text-ellenco-red font-bold text-[11px] transition-colors cursor-pointer" title="Recusar Solicitação">
+                    <button onclick="rejeitarUsuario(${u.id}, this.dataset.nome)" data-nome="${escapeHTML(u.nome)}" class="px-2.5 py-1 rounded-lg bg-red-100 hover:bg-red-200 text-ellenco-red font-bold text-[11px] transition-colors cursor-pointer" title="Recusar Solicitação">
                         <i class="fa-solid fa-xmark mr-1"></i> Recusar
                     </button>
                 </div>
             `;
         } else {
-            botoesAcao = `<span class="text-[11px] text-slate-400 font-semibold">${u.aprovado_por ? 'Por ' + u.aprovado_por : 'Liberado'}</span>`;
+            botoesAcao = `<span class="text-[11px] text-slate-400 font-semibold">${u.aprovado_por ? 'Por ' + escapeHTML(u.aprovado_por) : 'Liberado'}</span>`;
         }
 
         return `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="font-bold text-slate-900 text-xs">${u.nome}</td>
-                <td class="font-mono font-semibold text-slate-700 text-xs">${u.re}</td>
-                <td class="text-slate-600 text-xs">${u.email}</td>
-                <td class="text-slate-800 font-medium text-xs">${u.cargo_label || u.cargo}</td>
-                <td class="text-slate-600 text-xs truncate max-w-[160px]">${u.obra}</td>
+                <td class="font-bold text-slate-900 text-xs">${escapeHTML(u.nome)}</td>
+                <td class="font-mono font-semibold text-slate-700 text-xs">${escapeHTML(u.re)}</td>
+                <td class="text-slate-600 text-xs">${escapeHTML(u.email)}</td>
+                <td class="text-slate-800 font-medium text-xs">${escapeHTML(u.cargo_label || u.cargo)}</td>
+                <td class="text-slate-600 text-xs truncate max-w-[160px]">${escapeHTML(u.obra)}</td>
                 <td class="text-slate-500 text-xs">${dataFmt}</td>
                 <td class="text-center">${badgeStatus}</td>
                 <td class="text-center">${botoesAcao}</td>

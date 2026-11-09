@@ -89,7 +89,7 @@ async function efetuarLogin(e) {
         }, 600);
     } catch (err) {
         // Se falhar a autenticação restrita, mas o usuário estiver testando com demo:
-        if (senha === "123") {
+        if (senha === "123" && !(await api.isOnline())) {
             const usuarioDemo = {
                 nome: perfil === "operacional" ? "Carlos Silva" : "Eng. Ricardo Viana",
                 re: reInput || (perfil === "operacional" ? "RE-8842" : "RE-1005"),
@@ -110,36 +110,16 @@ async function efetuarLogin(e) {
 }
 
 async function loginRapido(perfilTipo) {
-    let usuarioSessao;
-    if (perfilTipo === "operacional") {
-        usuarioSessao = {
-            id: 1,
-            nome: "Carlos Silva",
-            re: "RE-8842",
-            cargo: "operacional",
-            cargoLabel: "Encarregado de Equipe",
-            nivel: 1,
-            obra: "SP-270 Rodovia Raposo Tavares"
-        };
-    } else {
-        usuarioSessao = {
-            id: 2,
-            nome: "Eng. Ricardo Viana",
-            re: "RE-1005",
-            cargo: "gestor",
-            cargoLabel: "Diretor de Operações",
-            nivel: 4,
-            obra: "Matriz / Todas as Obras"
-        };
+    const credencial = perfilTipo === "operacional" ? "RE-8842" : "RE-1005";
+    try {
+        const usuario = await api.loginUsuario(credencial, "123");
+        salvarSessao(usuario);
+        mostrarToast(`Acesso rápido (${usuario.cargoLabel})! Redirecionando...`, "sucesso");
+        setTimeout(() => { window.location.href = "dashboard.html"; }, 400);
+    } catch (err) {
+        mostrarToast(err.message || "Não foi possível entrar com a conta de demonstração.", "erro");
     }
-
-    salvarSessao(usuarioSessao);
-    mostrarToast(`Acesso rápido (${usuarioSessao.cargoLabel})! Redirecionando...`, "sucesso");
-    setTimeout(() => {
-        window.location.href = "dashboard.html";
-    }, 400);
 }
-
 async function efetuarCadastro(e) {
     e.preventDefault();
     const senha1 = document.getElementById("cadSenha").value;
@@ -207,21 +187,20 @@ async function consultarStatusSolicitacao() {
             msgStatus = `<p class="text-[11px] text-emerald-700 mt-2 font-bold">Seu acesso foi liberado! Você já pode entrar com suas credenciais na aba Entrar.</p>`;
         } else {
             badgeStatus = `<span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-full font-bold text-[10px]"><i class="fa-solid fa-ban mr-1"></i> Recusado</span>`;
-            msgStatus = `<p class="text-[11px] text-red-600 mt-2">Motivo: ${conta.motivoRejeicao || 'Dados inconsistentes com a obra. Procure seu gestor.'}</p>`;
+            msgStatus = `<p class="text-[11px] text-red-600 mt-2">Motivo: ${escapeHTML(conta.motivoRejeicao || 'Dados inconsistentes com a obra. Procure seu gestor.')}</p>`;
         }
 
         resBox.innerHTML = `
             <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h4 class="font-extrabold text-slate-900 text-sm">${conta.nome}</h4>
-                        <p class="text-[11px] text-slate-500 font-mono">${conta.re} • ${conta.cargoLabel || 'Colaborador'}</p>
+                        <h4 class="font-extrabold text-slate-900 text-sm">Solicitação localizada</h4>
+                        <p class="text-[11px] text-slate-500 font-mono">${escapeHTML(termo)} • ${escapeHTML(conta.cargoLabel || 'Colaborador')}</p>
                     </div>
                     ${badgeStatus}
                 </div>
                 <div class="mt-3 pt-2 border-t border-slate-200 text-[11px] text-slate-600 grid grid-cols-2 gap-2">
-                    <div><strong>Obra:</strong> ${conta.obra || 'SP-270 Raposo Tavares'}</div>
-                    <div><strong>Data:</strong> ${conta.dataSolicitacao || '-'}</div>
+                    <div><strong>Data:</strong> ${escapeHTML(conta.dataSolicitacao || '-')}</div>
                 </div>
                 ${msgStatus}
             </div>
@@ -230,7 +209,7 @@ async function consultarStatusSolicitacao() {
         resBox.innerHTML = `
             <div class="p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
                 <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-xmark"></i> Registro não localizado</p>
-                <p class="mt-1 text-[11px]">Nenhuma solicitação encontrada para "<strong>${termo}</strong>". Verifique os dados ou solicite seu cadastro.</p>
+                <p class="mt-1 text-[11px]">Nenhuma solicitação encontrada para "<strong>${escapeHTML(termo)}</strong>". Verifique os dados ou solicite seu cadastro.</p>
             </div>
         `;
     }

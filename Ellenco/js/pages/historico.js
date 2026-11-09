@@ -1,10 +1,16 @@
-﻿/* ==================================================================== */
+/* ==================================================================== */
 /* ELLENCO - HISTORICO.JS                                               */
 /* Controlador da Auditoria, Filtros Dinâmicos, Detalhes e Exportações   */
 /* ==================================================================== */
 
 let todosApontamentos = [];
 let listaFiltradaAtual = [];
+
+function dataHojeLocal() {
+    const agora = new Date();
+    agora.setMinutes(agora.getMinutes() - agora.getTimezoneOffset());
+    return agora.toISOString().slice(0, 10);
+}
 
 document.addEventListener("DOMContentLoaded", async () => {
     renderSidebar("historico");
@@ -205,14 +211,14 @@ function renderizarTabelaHistorico(lista) {
             <tr class="hover:bg-slate-50 transition-colors">
                 <td class="font-semibold text-slate-700 text-xs">${dataFmt}</td>
                 <td class="font-mono font-bold text-slate-800 text-[11px]">${protocolo}</td>
-                <td class="font-bold text-slate-900 text-xs">${item.obra}</td>
+                <td class="font-bold text-slate-900 text-xs">${escapeHTML(item.obra)}</td>
                 <td class="text-slate-700 text-xs">
-                    <span class="font-semibold block">${item.equipe}</span>
-                    <span class="text-[10px] text-slate-400">${item.encarregado}</span>
+                    <span class="font-semibold block">${escapeHTML(item.equipe)}</span>
+                    <span class="text-[10px] text-slate-400">${escapeHTML(item.encarregado)}</span>
                 </td>
-                <td class="text-slate-600 text-xs truncate max-w-[160px]">${item.atividade}</td>
-                <td class="text-right font-semibold text-slate-600 text-xs">${Number(item.planejado).toLocaleString("pt-BR")} ${item.unidade || ''}</td>
-                <td class="text-right font-black text-slate-900 text-xs">${Number(item.realizado).toLocaleString("pt-BR")} ${item.unidade || ''}</td>
+                <td class="text-slate-600 text-xs truncate max-w-[160px]">${escapeHTML(item.atividade)}</td>
+                <td class="text-right font-semibold text-slate-600 text-xs">${Number(item.planejado).toLocaleString("pt-BR")} ${escapeHTML(item.unidade || '')}</td>
+                <td class="text-right font-black text-slate-900 text-xs">${Number(item.realizado).toLocaleString("pt-BR")} ${escapeHTML(item.unidade || '')}</td>
                 <td class="text-right font-black text-xs ${desv >= 0 ? 'text-emerald-600' : 'text-ellenco-red'}">${desv >= 0 ? '+' : ''}${desv.toFixed(1)}%</td>
                 <td class="text-center">${badgeStatus}</td>
                 <td class="text-center no-print">
@@ -245,14 +251,14 @@ function abrirModalDetalhes(id) {
 
     container.innerHTML = `
         <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3.5 rounded-2xl border border-slate-200">
-            <div><strong>Obra:</strong> <span class="block text-slate-900 font-semibold">${item.obra}</span></div>
-            <div><strong>Data & Turno:</strong> <span class="block text-slate-900 font-semibold">${dataFmt} (${item.turno || 'Diurno'})</span></div>
-            <div><strong>Equipe:</strong> <span class="block text-slate-900 font-semibold">${item.equipe}</span></div>
-            <div><strong>Encarregado:</strong> <span class="block text-slate-900 font-semibold">${item.encarregado}</span></div>
+            <div><strong>Obra:</strong> <span class="block text-slate-900 font-semibold">${escapeHTML(item.obra)}</span></div>
+            <div><strong>Data & Turno:</strong> <span class="block text-slate-900 font-semibold">${dataFmt} (${escapeHTML(item.turno || 'Diurno') })</span></div>
+            <div><strong>Equipe:</strong> <span class="block text-slate-900 font-semibold">${escapeHTML(item.equipe)}</span></div>
+            <div><strong>Encarregado:</strong> <span class="block text-slate-900 font-semibold">${escapeHTML(item.encarregado)}</span></div>
         </div>
 
         <div class="p-3.5 rounded-2xl border border-slate-200 space-y-2">
-            <p><strong>Atividade:</strong> ${item.atividade}</p>
+            <p><strong>Atividade:</strong> ${escapeHTML(item.atividade)}</p>
             <div class="grid grid-cols-3 gap-2 pt-2 border-t border-slate-100 text-center">
                 <div><span class="text-[10px] text-slate-400 block">Meta</span><strong class="text-sm font-bold text-slate-800">${item.planejado} ${item.unidade}</strong></div>
                 <div><span class="text-[10px] text-slate-400 block">Realizado</span><strong class="text-sm font-black text-slate-900">${item.realizado} ${item.unidade}</strong></div>
@@ -261,8 +267,8 @@ function abrirModalDetalhes(id) {
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-slate-600">
-            <div><strong>Clima:</strong> ${item.clima || 'Ensolarado'}</div>
-            <div><strong>Paradas:</strong> ${item.parada || 'Nenhuma'}</div>
+            <div><strong>Clima:</strong> ${escapeHTML(item.clima || 'Ensolarado') }</div>
+            <div><strong>Paradas:</strong> ${escapeHTML(item.parada || 'Nenhuma') }</div>
             <div><strong>Jornada:</strong> ${item.horas || 8.5}h</div>
             <div><strong>Efetivo:</strong> ${item.efetivo || 14} pessoas</div>
         </div>
@@ -270,7 +276,7 @@ function abrirModalDetalhes(id) {
         ${item.obs ? `
             <div class="p-3 bg-blue-50/60 rounded-xl border border-blue-100 text-slate-700">
                 <strong>Observações:</strong>
-                <p class="mt-1 text-[11px] leading-relaxed">${item.obs}</p>
+                <p class="mt-1 text-[11px] leading-relaxed">${escapeHTML(item.obs)}</p>
             </div>
         ` : ''}
     `;
@@ -398,7 +404,7 @@ async function exportarExcel() {
     XLSX.utils.book_append_sheet(wb, ws1, "Apontamentos");
     XLSX.utils.book_append_sheet(wb, ws2, "Resumo por Obra");
 
-    const dataHoje = new Date().toISOString().split("T")[0];
+    const dataHoje = dataHojeLocal();
     XLSX.writeFile(wb, `Ellenco_Relatorio_Producao_${dataHoje}.xlsx`);
     mostrarToast("Planilha profissional gerada com sucesso!", "sucesso");
 }
@@ -408,7 +414,7 @@ function exportarPDF() {
     const elem = document.querySelector("main");
     const opt = {
         margin: [10, 10, 10, 10],
-        filename: `Auditoria_Producao_Ellenco_${new Date().toISOString().split("T")[0]}.pdf`,
+        filename: `Auditoria_Producao_Ellenco_${dataHojeLocal()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }

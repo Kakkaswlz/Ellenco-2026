@@ -7,10 +7,9 @@
  * Fallback: se DATABASE_URL não estiver definido, usa SQLite local.
  */
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 // ============================================================
 // DETECÇÃO AUTOMÁTICA: PostgreSQL (produção) ou SQLite (local)
@@ -37,7 +36,7 @@ if (USE_POSTGRES) {
     pool = new Pool({
         connectionString: cleanUrl,
         ssl: {
-            rejectUnauthorized: false
+            rejectUnauthorized: true
         },
         max: 10,
         idleTimeoutMillis: 30000,
@@ -134,6 +133,12 @@ async function execSQL(sql) {
     }
 }
 
+async function sincronizarAcumuladosEquipes() {
+    await queryRun(`UPDATE equipes SET
+        meta_acumulada = COALESCE((SELECT SUM(a.planejado) FROM apontamentos a WHERE a.equipe = equipes.nome), 0),
+        realizado_acumulado = COALESCE((SELECT SUM(a.realizado) FROM apontamentos a WHERE a.equipe = equipes.nome), 0)`);
+}
+
 // ============================================================
 // INICIALIZAÇÃO DO BANCO
 // ============================================================
@@ -183,7 +188,8 @@ async function initDatabase() {
             }
         }
     } catch (err) {
-        console.error('❌ Erro ao inicializar banco de dados:', err);
+        console.error('Database initialization failed:', err);
+        throw err;
     }
 }
 
@@ -232,7 +238,11 @@ module.exports = {
                     dados.senha
                 ]
             );
-            return { id: result.insertedId, ...dados };
+            const { senha, ...publicData } = dados;
+            return { id: result.insertedId, ...publicData };
+        },
+        async atualizarSenha(id, senha) {
+            await queryRun('UPDATE usuarios SET senha = $1 WHERE id = $2', [senha, id]);
         },
         async atualizarStatus(id, status, aprovadoPor = '', motivo = '') {
             await queryRun('UPDATE usuarios SET status = $1, aprovado_por = $2, motivo_rejeicao = $3 WHERE id = $4', [status, aprovadoPor, motivo, id]);
@@ -331,7 +341,7 @@ module.exports = {
             const desvio = dados.planejado > 0 ? ((dados.realizado - dados.planejado) / dados.planejado) * 100 : 0;
             const eficiencia = dados.planejado > 0 ? (dados.realizado / dados.planejado) * 100 : 100;
             const produtividade = dados.horas > 0 ? (dados.realizado / dados.horas) : 0;
-            const protocolo = dados.protocolo || `BDP-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const protocolo = dados.protocolo || `BDP-${new Date().getFullYear()}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`;
 
             const result = await queryRun(
                 `INSERT INTO apontamentos 
@@ -371,18 +381,7 @@ module.exports = {
                 }
             }
 
-            // Atualiza acumulados da equipe
-            try {
-                await queryRun(
-                    `UPDATE equipes 
-                     SET meta_acumulada = meta_acumulada + $1,
-                         realizado_acumulado = realizado_acumulado + $2
-                     WHERE nome = $3`,
-                    [dados.planejado, dados.realizado, dados.equipe]
-                );
-            } catch (e) {
-                console.warn('Erro ao atualizar acumulados da equipe:', e.message);
-            }
+            await sincronizarAcumuladosEquipes();
 
             return { id: result.insertedId, protocolo, ...dados, desvio, eficiencia, produtividade };
         },
@@ -405,11 +404,14 @@ module.exports = {
                     dados.clima, dados.parada, dados.obs, dados.status, id
                 ]
             );
+            await sincronizarAcumuladosEquipes();
             return this.buscarPorId(id);
         },
 
         async remover(id) {
-            return await queryRun('DELETE FROM apontamentos WHERE id = $1', [id]);
+            const result = await queryRun('DELETE FROM apontamentos WHERE id = $1', [id]);
+            await sincronizarAcumuladosEquipes();
+            return result;
         },
 
         async calcularKPIs(filtros = {}) {

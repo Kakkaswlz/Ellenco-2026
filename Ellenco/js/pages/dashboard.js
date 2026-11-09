@@ -133,8 +133,8 @@ function renderizarTabelaEquipesDashboard(dados) {
 
         return `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="py-2.5 px-3 font-bold text-slate-900 text-xs">${eq.nome}</td>
-                <td class="py-2.5 px-3 text-slate-600 text-xs truncate max-w-[180px]">${eq.atividade}</td>
+                <td class="py-2.5 px-3 font-bold text-slate-900 text-xs">${escapeHTML(eq.nome)}</td>
+                <td class="py-2.5 px-3 text-slate-600 text-xs truncate max-w-[180px]">${escapeHTML(eq.atividade)}</td>
                 <td class="py-2.5 px-3 text-right font-semibold text-slate-600 text-xs">${eq.planejado.toLocaleString("pt-BR")}</td>
                 <td class="py-2.5 px-3 text-right font-black text-slate-900 text-xs">${eq.realizado.toLocaleString("pt-BR")}</td>
                 <td class="py-2.5 px-3 text-center">${badgeStatus}</td>

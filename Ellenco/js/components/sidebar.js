@@ -133,8 +133,8 @@ function renderSidebar(activePage = "dashboard") {
                         ${iniciais}
                     </div>
                     <div class="flex flex-col justify-center overflow-hidden">
-                        <p id="userNomeLabel" class="font-bold text-xs truncate text-white leading-tight">${usuario.nome}</p>
-                        <p id="userCargoLabel" class="text-[10px] text-slate-300 truncate leading-tight mt-0.5">${usuario.cargoLabel || 'Ellenco Construções'}</p>
+                        <p id="userNomeLabel" class="font-bold text-xs truncate text-white leading-tight">${escapeHTML(usuario.nome)}</p>
+                        <p id="userCargoLabel" class="text-[10px] text-slate-300 truncate leading-tight mt-0.5">${escapeHTML(usuario.cargoLabel || 'Ellenco Construções')}</p>
                     </div>
                 </div>
                 <button onclick="efetuarLogout()" title="Sair do Sistema" class="p-2 rounded-lg bg-white/10 hover:bg-red-500/30 text-white transition-colors cursor-pointer shrink-0">
