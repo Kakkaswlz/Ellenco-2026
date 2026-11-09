@@ -1,4 +1,4 @@
-﻿/* ==================================================================== */
+/* ==================================================================== */
 /* ELLENCO - HISTORICO.JS                                               */
 /* Controlador da Auditoria, Filtros Dinâmicos, Detalhes e Exportações   */
 /* ==================================================================== */
@@ -300,7 +300,12 @@ async function excluirApontamento(id) {
     }
 }
 
-// EXPORTAÇÕES EXCEL E PDF (Respeitam a seleção filtrada)
+/**
+ * EXPORTAÇÃO EXCEL PROFISSIONAL & LIMPA
+ * Gera uma planilha estruturada como tabela na Aba 1, com colunas auto-ajustadas
+ * e valores numéricos formatados para somas e medições.
+ * Inclui também a Aba 2 com o resumo consolidado por obra.
+ */
 async function exportarExcel() {
     const dadosOrigem = (listaFiltradaAtual && listaFiltradaAtual.length) ? listaFiltradaAtual : todosApontamentos;
 
@@ -309,30 +314,93 @@ async function exportarExcel() {
         return;
     }
 
-    const dadosExcel = dadosOrigem.map(i => ({
-        Protocolo: i.protocolo || `BDP-${i.id}`,
-        Data: i.data,
-        Turno: i.turno,
-        Obra: i.obra,
-        Equipe: i.equipe,
-        Encarregado: i.encarregado,
-        Atividade: i.atividade,
-        Unidade: i.unidade,
-        "Meta Planejada": i.planejado,
-        "Produção Real": i.realizado,
-        "Desvio %": i.desvio,
-        "Eficiência %": i.eficiencia,
-        "Produtividade/h": i.produtividade,
-        Clima: i.clima,
-        Ocorrência: i.parada,
-        Observações: i.obs
-    }));
+    // 1. ABA 1: TABELA COMPLETA DE APONTAMENTOS (Colunas na primeira linha, dados abaixo)
+    const dadosTabela = dadosOrigem.map(i => {
+        const dataFmt = i.data ? i.data.split("-").reverse().join("/") : "-";
+        const planejado = parseFloat(i.planejado) || 0;
+        const realizado = parseFloat(i.realizado) || 0;
+        const desvio = parseFloat(i.desvio) || 0;
+        const eficiencia = parseFloat(i.eficiencia) || 0;
 
-    const ws = XLSX.utils.json_to_sheet(dadosExcel);
+        let desempenho = "Superada";
+        if (desvio < -10) desempenho = "Crítico";
+        else if (desvio < 0) desempenho = "Atenção";
+
+        return {
+            "Protocolo": i.protocolo || `BDP-2026-${i.id}`,
+            "Data": dataFmt,
+            "Obra": i.obra || "",
+            "Equipe": i.equipe || "",
+            "Encarregado": i.encarregado || "",
+            "Atividade / Serviço": i.atividade || "",
+            "Unidade": i.unidade || "",
+            "Meta Planejada": planejado,
+            "Produção Real": realizado,
+            "Desvio (%)": Number(desvio.toFixed(2)),
+            "Eficiência (%)": Number(eficiencia.toFixed(2)),
+            "Status Desempenho": desempenho,
+            "Turno": i.turno || "Diurno",
+            "Clima": i.clima || "Ensolarado",
+            "Ocorrência / Parada": i.parada || "Nenhuma",
+            "Observações": i.obs || ""
+        };
+    });
+
+    const ws1 = XLSX.utils.json_to_sheet(dadosTabela);
+
+    // Auto-ajuste de largura das colunas da tabela
+    const chaves = Object.keys(dadosTabela[0] || {});
+    ws1["!cols"] = chaves.map(k => {
+        let maxLen = k.length;
+        dadosTabela.forEach(linha => {
+            const val = linha[k] !== undefined && linha[k] !== null ? String(linha[k]) : "";
+            if (val.length > maxLen) maxLen = val.length;
+        });
+        return { wch: Math.min(Math.max(maxLen + 3, 11), 45) };
+    });
+
+    // 2. ABA 2: RESUMO EXECUTIVO CONSOLIDADO POR OBRA
+    const resumoObras = {};
+    dadosOrigem.forEach(i => {
+        const nomeObra = i.obra || "Geral";
+        if (!resumoObras[nomeObra]) {
+            resumoObras[nomeObra] = { obra: nomeObra, apontamentos: 0, planejado: 0, realizado: 0 };
+        }
+        resumoObras[nomeObra].apontamentos += 1;
+        resumoObras[nomeObra].planejado += (parseFloat(i.planejado) || 0);
+        resumoObras[nomeObra].realizado += (parseFloat(i.realizado) || 0);
+    });
+
+    const dadosResumo = Object.values(resumoObras).map(r => {
+        const desvioTotal = r.planejado > 0 ? (((r.realizado - r.planejado) / r.planejado) * 100) : 0;
+        return {
+            "Obra / Frente de Serviço": r.obra,
+            "Qtd. de Boletins": r.apontamentos,
+            "Total Planejado": Number(r.planejado.toFixed(2)),
+            "Total Realizado": Number(r.realizado.toFixed(2)),
+            "Desvio Geral (%)": Number(desvioTotal.toFixed(2)),
+            "Desempenho Geral": desvioTotal >= 0 ? "Meta Atingida" : (desvioTotal >= -10 ? "Atenção" : "Abaixo da Meta")
+        };
+    });
+
+    const ws2 = XLSX.utils.json_to_sheet(dadosResumo);
+    ws2["!cols"] = [
+        { wch: 38 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 18 },
+        { wch: 22 }
+    ];
+
+    // Criar pasta de trabalho do Excel e anexar as abas
     const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Auditoria_Ellenco");
-    XLSX.writeFile(wb, `Auditoria_Producao_Ellenco_${new Date().toISOString().split("T")[0]}.xlsx`);
-    mostrarToast("Planilha Excel exportada com sucesso!", "sucesso");
+    XLSX.utils.book_append_sheet(wb, ws1, "Apontamentos");
+    XLSX.utils.book_append_sheet(wb, ws2, "Resumo por Obra");
+
+    const dataHoje = new Date().toISOString().split("T")[0];
+    XLSX.writeFile(wb, `Ellenco_Relatorio_Producao_${dataHoje}.xlsx`);
+    mostrarToast("Planilha profissional gerada com sucesso!", "sucesso");
 }
 
 function exportarPDF() {
