@@ -278,7 +278,7 @@ async function registrarApontamento(e) {
     };
 
     try {
-        mostrarToast("Gravando BDP no banco de dados SQLite...", "info");
+        mostrarToast(`Gravando BDP no ${await api.getDatabaseLabel()}...`, "info");
         await api.postApontamento(dados);
 
         mostrarToast("Apontamento gravado com sucesso no banco de dados!", "sucesso");

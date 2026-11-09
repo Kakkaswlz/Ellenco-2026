@@ -62,7 +62,7 @@ function renderizarTabelaUsuarios(lista) {
             badgeStatus = `<span class="badge badge-danger"><i class="fa-solid fa-ban"></i> Recusado</span>`;
         }
 
-        const dataFmt = u.criado_em ? u.criado_em.split(" ")[0].split("-").reverse().join("/") : "-";
+        const dataFmt = formatarDataSolicitacao(u.criado_em);
 
         let botoesAcao = '';
         if (u.status === 'pendente') {
@@ -93,6 +93,22 @@ function renderizarTabelaUsuarios(lista) {
             </tr>
         `;
     }).join("");
+}
+
+function formatarDataSolicitacao(valor) {
+    if (!valor) return "-";
+
+    const dataTexto = String(valor).trim();
+    const partesData = dataTexto.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!partesData) return "-";
+
+    const [, ano, mes, dia] = partesData;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dataTexto)) return `${dia}/${mes}/${ano}`;
+
+    const data = new Date(dataTexto);
+    if (Number.isNaN(data.getTime())) return `${dia}/${mes}/${ano}`;
+
+    return new Intl.DateTimeFormat("pt-BR", { timeZone: "America/Sao_Paulo" }).format(data);
 }
 
 async function aprovarUsuario(id, nome) {

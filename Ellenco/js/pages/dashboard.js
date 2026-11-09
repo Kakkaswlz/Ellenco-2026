@@ -39,16 +39,23 @@ window.onFiltroGlobalAlterado = async function(filtros) {
 
 async function atualizarDashboard() {
     try {
-        const isDbOnline = await api.isOnline();
+        const [isDbOnline, databaseLabel] = await Promise.all([
+            api.isOnline(),
+            api.getDatabaseLabel()
+        ]);
         const badgeDb = document.getElementById("badgeDbStatus");
         if (badgeDb) {
             if (isDbOnline) {
-                badgeDb.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SQLite Conectado`;
+                badgeDb.innerHTML = `<span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> ${escapeHTML(databaseLabel)} Conectado`;
                 badgeDb.className = "font-mono text-xs font-black text-emerald-300 flex items-center gap-1.5 justify-end";
             } else {
                 badgeDb.innerHTML = `<span class="h-2 w-2 rounded-full bg-amber-400"></span> Local Sync Ativo`;
                 badgeDb.className = "font-mono text-xs font-black text-amber-300 flex items-center gap-1.5 justify-end";
             }
+        }
+        const databasePrintLabel = document.getElementById("databasePrintLabel");
+        if (databasePrintLabel) {
+            databasePrintLabel.textContent = isDbOnline ? databaseLabel : "Base local (modo demonstração)";
         }
 
         // Consultas assíncronas ao banco de dados / API

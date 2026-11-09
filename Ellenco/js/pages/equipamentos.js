@@ -114,7 +114,7 @@ async function salvarNovoEquipamento(e) {
     };
 
     try {
-        mostrarToast("Cadastrando equipamento no SQLite...", "info");
+        mostrarToast(`Cadastrando equipamento no ${await api.getDatabaseLabel()}...`, "info");
         await api.postEquipamento(novo);
         mostrarToast("Equipamento cadastrado com sucesso!", "sucesso");
         fecharModalNovoEquipamento();

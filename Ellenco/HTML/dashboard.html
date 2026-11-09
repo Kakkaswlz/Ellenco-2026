@@ -75,7 +75,7 @@
             </div>
             <div class="text-right text-xs text-slate-500">
                 <p>Emissão: <strong id="printDataEmissao">27/08/2026</strong></p>
-                <p>Banco de Dados Relacional SQLite</p>
+                <p id="databasePrintLabel">Banco de Dados Relacional</p>
             </div>
         </div>
 
@@ -96,7 +96,7 @@
                         Painel Executivo de Produção
                     </h2>
                     <p class="text-slate-200 text-xs md:text-sm mt-2 leading-relaxed">
-                        Acompanhamento imediato das metas de pavimentação, terraplanagem e infraestrutura, com integração direta ao banco de dados SQLite.
+                        Acompanhamento imediato das metas de pavimentação, terraplanagem e infraestrutura, com integração direta ao banco de dados configurado.
                     </p>
                 </div>
 
@@ -104,7 +104,7 @@
                     <div class="bg-white/10 backdrop-blur-md px-4 py-2.5 rounded-xl border border-white/15 text-right">
                         <span class="text-[10px] uppercase font-bold text-slate-300 block">Status do Banco</span>
                         <span id="badgeDbStatus" class="font-mono text-xs font-black text-emerald-300 flex items-center gap-1.5 justify-end">
-                            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> SQLite Conectado
+                            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> Verificando conexão...
                         </span>
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                     </div>
 
                     <div class="pt-3 border-t border-slate-100 flex justify-between items-center text-[11px] text-slate-500">
-                        <span>Atualização contínua com gravação no SQLite</span>
+                        <span>Atualização contínua com gravação no banco conectado</span>
                         <a href="historico-auditoria.html" class="font-bold text-ellenco-navy hover:underline">Auditoria Completa &rarr;</a>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 /* ==================================================================== */
 /* ELLENCO - API.JS                                                     */
-/* Camada Central de Dados com SQLite REST API e Fallback Inteligente   */
+/* Camada Central de Dados com API REST e Fallback Local                */
 /* ==================================================================== */
 
 const API_BASE_URL = (window.location.protocol === 'http:' || window.location.protocol === 'https:')
@@ -265,6 +265,18 @@ const api = {
     // ==========================================
     async isOnline() {
         return await testarServidor();
+    },
+
+    async getDatabaseLabel() {
+        if (!(await testarServidor())) return "Base local";
+        try {
+            const res = await fetchAPI(`${API_BASE_URL}/status`, { signal: AbortSignal.timeout(1500) });
+            if (!res.ok) return "Banco conectado";
+            const status = await res.json();
+            return status.banco || "Banco conectado";
+        } catch (e) {
+            return "Banco conectado";
+        }
     },
 
     // ==========================================

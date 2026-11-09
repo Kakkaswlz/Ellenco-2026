@@ -37,7 +37,7 @@
                     <div>
                         <h4 class="font-extrabold text-sm tracking-tight leading-tight">Assistente Ellenco</h4>
                         <span class="text-[10px] text-emerald-300 font-bold flex items-center gap-1">
-                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> SQLite & IA Conectados
+                            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Banco & IA Conectados
                         </span>
                     </div>
                 </div>
@@ -61,7 +61,7 @@
                     <div class="chat-avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="chat-bubble space-y-2">
                         <p><strong>Olá! Sou o Assistente Inteligente da Ellenco.</strong></p>
-                        <p class="text-xs text-slate-600">Estou conectado em tempo real ao banco de dados SQLite para responder dúvidas sobre produção, apontamentos, equipes, frotas e ocorrências.</p>
+                        <p class="text-xs text-slate-600">Estou conectado em tempo real ao banco de dados configurado para responder dúvidas sobre produção, apontamentos, equipes, frotas e ocorrências.</p>
                         
                         <div class="pt-2">
                             <span class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Perguntas Rápidas:</span>
