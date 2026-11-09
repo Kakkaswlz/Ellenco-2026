@@ -33,9 +33,20 @@ if (USE_POSTGRES) {
         cleanUrl = DATABASE_URL.replace(/[?&]sslmode=[^&]+/g, '');
     }
 
+    // Render disponibiliza Secret Files em /etc/secrets/<nome>.
+    // Configure um Secret File chamado supabase-ca.crt com o CA do Supabase.
+    const sslRootCertPath = process.env.PGSSLROOTCERT || '/etc/secrets/supabase-ca.crt';
+    let sslRootCert;
+    try {
+        sslRootCert = fs.readFileSync(sslRootCertPath, 'utf8');
+    } catch (err) {
+        throw new Error(`Certificado CA do PostgreSQL não encontrado em ${sslRootCertPath}. Configure o Secret File supabase-ca.crt no Render.`, { cause: err });
+    }
+
     pool = new Pool({
         connectionString: cleanUrl,
         ssl: {
+            ca: sslRootCert,
             rejectUnauthorized: true
         },
         max: 10,
