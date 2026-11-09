@@ -1,18 +1,18 @@
-﻿/* ==================================================================== */
+/* ==================================================================== */
 /* ELLENCO - NOVO-APONTAMENTO.JS                                        */
-/* Controlador do Formul├írio de Registro de Produ├º├úo de Campo (BDP)     */
+/* Controlador do Formulário de Registro de Produção de Campo (BDP)     */
 /* ==================================================================== */
 
 /* ==================================================================== */
-/* ATIVIDADES: padr├úo + personalizadas (salvas neste navegador)         */
+/* ATIVIDADES: padrão + personalizadas (salvas neste navegador)         */
 /* ==================================================================== */
 const UNIDADES_PADRAO = {
-    "Pavimenta├º├úo CBUQ - Capa Asf├íltica": "ton",
-    "Terraplanagem - Corte e Aterro": "m┬│",
-    "Aplica├º├úo de Brita Graduada (BGS)": "m┬│",
+    "Pavimentação CBUQ - Capa Asfáltica": "ton",
+    "Terraplanagem - Corte e Aterro": "m³",
+    "Aplicação de Brita Graduada (BGS)": "m³",
     "Assentamento de Tubos e Galerias": "m",
-    "Fresagem de Pavimento Asf├íltico": "m┬▓",
-    "Pintura Termopl├ística e Tachas": "m┬▓"
+    "Fresagem de Pavimento Asfáltico": "m²",
+    "Pintura Termoplástica e Tachas": "m²"
 };
 const CHAVE_ATIVIDADES = "ellenco_atividades_personalizadas";
 let atividadesPersonalizadas = {};
@@ -38,13 +38,13 @@ function adicionarOpcaoAtividade(nome, unidade) {
 }
 
 async function carregarAtividadesPersonalizadas() {
-    // 1) Atividades guardadas neste navegador (usadas quando o servidor est├í offline)
+    // 1) Atividades guardadas neste navegador (usadas quando o servidor está offline)
     atividadesPersonalizadas = lerAtividadesSalvas();
     Object.entries(atividadesPersonalizadas).forEach(([nome, unidade]) => {
         adicionarOpcaoSeNaoExiste(nome, String(unidade));
     });
 
-    // 2) Atividades do banco de dados (cat├ílogo compartilhado)
+    // 2) Atividades do banco de dados (catálogo compartilhado)
     try {
         const lista = await api.getAtividades();
         if (Array.isArray(lista)) {
@@ -54,7 +54,7 @@ async function carregarAtividadesPersonalizadas() {
             });
             alterarUnidade();
         }
-    } catch (e) { /* mant├®m apenas as atividades locais */ }
+    } catch (e) { /* mantém apenas as atividades locais */ }
 }
 
 function adicionarOpcaoSeNaoExiste(nome, unidade) {
@@ -68,11 +68,11 @@ function adicionarOpcaoSeNaoExiste(nome, unidade) {
 
 document.addEventListener("DOMContentLoaded", () => {
     renderSidebar("apontamento");
-    renderTopbar("Novo Apontamento", "Registro di├írio com valida├º├úo imediata e grava├º├úo no banco", false);
+    renderTopbar("Novo Apontamento", "Registro diário com validação imediata e gravação no banco", false);
     verificarAutenticacao();
     aplicarPermissoesCargo();
 
-    // Data padr├úo: hoje
+    // Data padrão: hoje
     const inputData = document.getElementById("data");
     if (inputData) {
         inputData.value = new Date().toISOString().split("T")[0];
@@ -104,12 +104,12 @@ function aoMudarEquipe() {
     const ativ = document.getElementById("atividade");
 
     const mapaLider = {
-        "Equipe Pavimenta├º├úo 01": { enc: "Carlos Silva", ativ: "Pavimenta├º├úo CBUQ - Capa Asf├íltica" },
+        "Equipe Pavimentação 01": { enc: "Carlos Silva", ativ: "Pavimentação CBUQ - Capa Asfáltica" },
         "Equipe Terraplanagem 02": { enc: "Marcos Souza", ativ: "Terraplanagem - Corte e Aterro" },
-        "Equipe Drenagem 01": { enc: "Jos├® Santos", ativ: "Assentamento de Tubos e Galerias" },
-        "Equipe Base 03": { enc: "Ant├┤nio Ferreira", ativ: "Aplica├º├úo de Brita Graduada (BGS)" },
-        "Equipe Fresagem 01": { enc: "Paulo Lima", ativ: "Fresagem de Pavimento Asf├íltico" },
-        "Equipe Sinaliza├º├úo Noturna": { enc: "Roberto Dias", ativ: "Pintura Termopl├ística e Tachas" }
+        "Equipe Drenagem 01": { enc: "José Santos", ativ: "Assentamento de Tubos e Galerias" },
+        "Equipe Base 03": { enc: "Antônio Ferreira", ativ: "Aplicação de Brita Graduada (BGS)" },
+        "Equipe Fresagem 01": { enc: "Paulo Lima", ativ: "Fresagem de Pavimento Asfáltico" },
+        "Equipe Sinalização Noturna": { enc: "Roberto Dias", ativ: "Pintura Termoplástica e Tachas" }
     };
 
     if (mapaLider[eq]) {
@@ -122,7 +122,7 @@ function aoMudarEquipe() {
 }
 
 function aoMudarObra() {
-    // Pode sincronizar equipe se aplic├ível
+    // Pode sincronizar equipe se aplicável
 }
 
 function calcularDesvio() {
@@ -147,7 +147,7 @@ function calcularDesvio() {
         if (box) box.className = "p-4 rounded-2xl border bg-slate-50 border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all";
         if (icone) icone.className = "fa-solid fa-calculator text-2xl text-slate-400";
         if (texto) texto.textContent = "Aguardando preenchimento dos volumes...";
-        if (detalhe) detalhe.textContent = "Insira a meta e a produ├º├úo realizada para ver o c├ílculo autom├ítico.";
+        if (detalhe) detalhe.textContent = "Insira a meta e a produção realizada para ver o cálculo automático.";
         if (avisoTypo) avisoTypo.classList.add("hidden");
         return;
     }
@@ -178,21 +178,21 @@ function calcularDesvio() {
         icone.className = "fa-solid fa-circle-check text-2xl text-emerald-600";
         texto.textContent = "Meta Atingida com Sucesso!";
         texto.className = "text-sm font-black text-emerald-950";
-        detalhe.textContent = `A equipe superou a programa├º├úo em ${desvio.toFixed(1)}% (${(realizado - planejado).toFixed(1)} ${u} adicionais).`;
+        detalhe.textContent = `A equipe superou a programação em ${desvio.toFixed(1)}% (${(realizado - planejado).toFixed(1)} ${u} adicionais).`;
         detalhe.className = "text-xs text-emerald-700";
     } else if (eficiencia >= 90) {
         box.className = "p-4 rounded-2xl border bg-blue-50 border-blue-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all";
         icone.className = "fa-solid fa-circle-info text-2xl text-blue-600";
-        texto.textContent = "Produ├º├úo Dentro da Faixa Aceit├ível";
+        texto.textContent = "Produção Dentro da Faixa Aceitável";
         texto.className = "text-sm font-black text-blue-950";
-        detalhe.textContent = `Atingimento de ${eficiencia.toFixed(1)}% da meta. Varia├º├úo de ${Math.abs(desvio).toFixed(1)}%.`;
+        detalhe.textContent = `Atingimento de ${eficiencia.toFixed(1)}% da meta. Variação de ${Math.abs(desvio).toFixed(1)}%.`;
         detalhe.className = "text-xs text-blue-700";
     } else {
         box.className = "p-4 rounded-2xl border bg-red-50 border-red-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all";
         icone.className = "fa-solid fa-triangle-exclamation text-2xl text-ellenco-red";
-        texto.textContent = "Alerta: Desvio Cr├¡tico de Produ├º├úo";
+        texto.textContent = "Alerta: Desvio Crítico de Produção";
         texto.className = "text-sm font-black text-red-950";
-        detalhe.textContent = `Rendimento de apenas ${eficiencia.toFixed(1)}% (${(planejado - realizado).toFixed(1)} ${u} abaixo da meta). Justifique nas ocorr├¬ncias.`;
+        detalhe.textContent = `Rendimento de apenas ${eficiencia.toFixed(1)}% (${(planejado - realizado).toFixed(1)} ${u} abaixo da meta). Justifique nas ocorrências.`;
         detalhe.className = "text-xs text-red-700";
     }
 }
@@ -202,7 +202,7 @@ async function puxarClimaParaFormulario() {
     let cidade = "Sorocaba";
     if (obra.includes("Industrial")) cidade = "Campinas";
     if (obra.includes("Jardim")) cidade = "Votorantim";
-    if (obra.includes("Aeroporto")) cidade = "Ribeir├úo Preto";
+    if (obra.includes("Aeroporto")) cidade = "Ribeirão Preto";
 
     mostrarToast(`Consultando clima para ${cidade}...`, "info");
     const clima = await api.consultarClima(cidade);
@@ -222,10 +222,10 @@ async function puxarClimaParaFormulario() {
 
     const obs = document.getElementById("observacao");
     if (obs && !obs.value) {
-        obs.value = `Clima capturado via Open-Meteo: ${clima.cidade} (${clima.temperatura}┬░C, ${clima.condicaoTexto}, vento ${clima.vento} km/h).`;
+        obs.value = `Clima capturado via Open-Meteo: ${clima.cidade} (${clima.temperatura}°C, ${clima.condicaoTexto}, vento ${clima.vento} km/h).`;
     }
 
-    mostrarToast(`Clima preenchido: ${clima.condicaoTexto} (${clima.temperatura}┬░C)`, "sucesso");
+    mostrarToast(`Clima preenchido: ${clima.condicaoTexto} (${clima.temperatura}°C)`, "sucesso");
 }
 
 function gerarNovoProtocolo() {
@@ -241,13 +241,13 @@ async function registrarApontamento(e) {
     const realizado = parseFloat(document.getElementById("realizado").value);
 
     if (isNaN(planejado) || isNaN(realizado) || planejado <= 0) {
-        mostrarToast("Preencha corretamente os valores de meta e produ├º├úo.", "erro");
+        mostrarToast("Preencha corretamente os valores de meta e produção.", "erro");
         return;
     }
 
     const checkAssinatura = document.getElementById("checkAssinatura");
     if (!checkAssinatura || !checkAssinatura.checked) {
-        mostrarToast("Voc├¬ deve marcar o termo de assinatura digital.", "warning");
+        mostrarToast("Você deve marcar o termo de assinatura digital.", "warning");
         return;
     }
 
@@ -278,7 +278,7 @@ async function registrarApontamento(e) {
         mostrarToast("Apontamento gravado com sucesso no banco de dados!", "sucesso");
 
         setTimeout(() => {
-            if (confirm("Apontamento registrado com sucesso!\n\nDeseja visualizar o registro no Hist├│rico & Auditoria?")) {
+            if (confirm("Apontamento registrado com sucesso!\n\nDeseja visualizar o registro no Histórico & Auditoria?")) {
                 window.location.href = "historico-auditoria.html";
             } else {
                 limparFormulario();
