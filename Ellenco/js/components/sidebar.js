@@ -1,6 +1,6 @@
-/* ==================================================================== */
+﻿/* ==================================================================== */
 /* ELLENCO - SIDEBAR.JS                                                 */
-/* Componente Reutilizável de Barra Lateral de Navegação                */
+/* Componente Reutilizável de Barra Lateral com Controle de Acesso      */
 /* ==================================================================== */
 
 function renderSidebar(activePage = "dashboard") {
@@ -10,6 +10,7 @@ function renderSidebar(activePage = "dashboard") {
     const usuario = (typeof getUsuarioLogado === "function") ? getUsuarioLogado() : {
         nome: "Carlos Silva",
         cargoLabel: "Encarregado de Equipe",
+        cargo: "operacional",
         nivel: 1
     };
 
@@ -17,7 +18,8 @@ function renderSidebar(activePage = "dashboard") {
         ? usuario.nome.split(" ").map(n => n[0]).slice(0, 2).join("").toUpperCase()
         : "CS";
 
-    const menuItems = [
+    // Todos os itens de menu do sistema
+    const todosItensMenu = [
         {
             id: "dashboard",
             url: "dashboard.html",
@@ -35,31 +37,36 @@ function renderSidebar(activePage = "dashboard") {
             id: "historico",
             url: "historico-auditoria.html",
             icon: "fa-solid fa-clock-rotate-left",
-            label: "Histórico & Auditoria"
+            label: "Histórico & Auditoria",
+            restritoEngenharia: true
         },
         {
             id: "atividades",
             url: "atividades.html",
             icon: "fa-solid fa-list-check",
-            label: "Atividades"
+            label: "Atividades",
+            restritoEngenharia: true
         },
         {
             id: "equipes",
             url: "equipes-campo.html",
             icon: "fa-solid fa-users-gear",
-            label: "Equipes de Campo"
+            label: "Equipes de Campo",
+            restritoEngenharia: true
         },
         {
             id: "obras",
             url: "obras-frentes.html",
             icon: "fa-solid fa-road-bridge",
-            label: "Obras & Frentes"
+            label: "Obras & Frentes",
+            restritoEngenharia: true
         },
         {
             id: "equipamentos",
             url: "equipamentos-frota.html",
             icon: "fa-solid fa-truck-monster",
-            label: "Equipamentos & Frota"
+            label: "Equipamentos & Frota",
+            restritoEngenharia: true
         },
         {
             id: "aprovacoes",
@@ -67,9 +74,21 @@ function renderSidebar(activePage = "dashboard") {
             icon: "fa-solid fa-user-shield",
             label: "Gestão de Acessos",
             badge: "Gestão",
-            restrito: true
+            restritoEngenharia: true,
+            restritoGestor: true
         }
     ];
+
+    // Checagem de Perfil: Usuário do Campo vs Engenharia/Diretoria
+    const ehUsuarioCampo = (typeof isUsuarioCampo === "function")
+        ? isUsuarioCampo(usuario)
+        : (usuario.cargo === "operacional" || usuario.cargo === "apontador" || Number(usuario.nivel) <= 1);
+
+    // Se for do campo/apontamento: exibe APENAS Dashboard e Novo Apontamento
+    // Se for engenharia/diretoria: exibe o menu completo
+    const menuItems = ehUsuarioCampo
+        ? todosItensMenu.filter(item => item.id === "dashboard" || item.id === "apontamento")
+        : todosItensMenu.filter(item => !item.restritoGestor || (usuario.nivel >= 3 || usuario.cargo === "gestor"));
 
     let navHtml = menuItems.map(item => {
         const isActive = activePage === item.id;
@@ -77,10 +96,8 @@ function renderSidebar(activePage = "dashboard") {
             ? "menu-item active w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left"
             : "menu-item w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left";
 
-        const restritoClass = item.restrito ? "menu-item-aprovacoes" : "";
-
         return `
-            <a href="${item.url}" class="${activeClasses} ${restritoClass}">
+            <a href="${item.url}" class="${activeClasses}">
                 <i class="${item.icon} text-base w-5 text-center"></i>
                 <span class="text-xs font-semibold">${item.label}</span>
                 ${item.badge ? `<span class="ml-auto bg-white/10 text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/10">${item.badge}</span>` : ''}
@@ -102,7 +119,7 @@ function renderSidebar(activePage = "dashboard") {
                 </div>
             </div>
 
-            <!-- NAV MENU -->
+            <!-- NAV MENU DINÂMICO CONFORME PERFIL -->
             <nav class="p-4 space-y-1 font-medium">
                 ${navHtml}
             </nav>
@@ -125,7 +142,7 @@ function renderSidebar(activePage = "dashboard") {
                 </button>
             </div>
             <div class="mt-3 pt-2.5 border-t border-white/10 flex items-center justify-between text-[10px] text-slate-300">
-                <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-emerald-400"></i> SQLite Ativo</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-database text-emerald-400"></i> Sistema Online</span>
                 <span class="bg-white/10 px-2 py-0.5 rounded font-mono font-bold">v2.5 Digital</span>
             </div>
         </div>
